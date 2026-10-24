@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{})}">
+<head>
+    <title>Admin Operations Center | FindIt</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h1>Admin Operations Center</h1>
+                <span class="badge badge-admin">Campus Moderator</span>
+            </div>
+            <p class="text-muted" style="margin-bottom: 0;">Campus-wide moderation, pending claims oversight, and student account management.</p>
+        </div>
+    </div>
+
+    <!-- Aggregate Statistics Grid -->
+    <div class="stats-grid mb-4">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-icon-blue">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            </div>
+            <div>
+                <div class="stat-value" th:text="${stats.totalReports}">0</div>
+                <div class="stat-label">Total System Reports</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-icon-amber">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <div>
+                <div class="stat-value" th:text="${stats.openLostCount}">0</div>
+                <div class="stat-label">Active Lost Items</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-icon-green">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <div>
+                <div class="stat-value" th:text="${stats.pendingClaimsCount}">0</div>
+                <div class="stat-label">Unresolved Claims</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-icon-navy">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+                <div class="stat-value"><span th:text="${stats.recoveryRate}">0</span>%</div>
+                <div class="stat-label">Recovery Rate (<span th:text="${stats.resolvedCount}">0</span> resolved)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Navigation Tabs -->
+    <ul class="tabs-nav" role="tablist">
+        <li>
+            <button class="tab-link active" data-tab-target="#claims-tab">
+                Pending Claims Queue (<span th:text="${pendingClaims.size()}">0</span>)
+            </button>
+        </li>
+        <li>
+            <button class="tab-link" data-tab-target="#items-tab">
+                Item Moderation (<span th:text="${items.totalElements}">0</span>)
+            </button>
+        </li>
+        <li>
+            <button class="tab-link" data-tab-target="#users-tab">
+                User Directory (<span th:text="${users.totalElements}">0</span>)
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab 1: Pending Claims Queue -->
+    <div id="claims-tab" class="tab-pane">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 style="font-size: 1.15rem; margin-bottom: 0.25rem;">Active Claims Awaiting Resolution</h3>
+                    <p class="text-muted" style="margin-bottom: 0; font-size: 0.85rem;">Admins can review submitted ownership proof or intervene if items remain unverified.</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div th:if="${pendingClaims != null && !pendingClaims.isEmpty()}" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Item</th>
+                                <th>Item Reporter</th>
+                                <th>Claimant</th>
+                                <th>Submitted On</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${pendingClaims}">
+                                <td>#<span th:text="${c.id}">1</span></td>
+                                <td>
+                                    <a th:href="@{'/items/' + ${c.item.id}}" th:text="${c.item.title}" style="font-weight: 700;">Item Title</a>
+                                    <div style="font-size: 0.8rem; color: var(--color-slate-500);" th:text="${c.item.location}">Location</div>
+                                </td>
+                                <td th:text="${c.item.user.fullName}">Reporter</td>
+                                <td>
+                                    <strong th:text="${c.claimant.fullName}">Claimant</strong>
+                                    <div style="font-size: 0.75rem; color: var(--color-slate-500);" th:text="${c.claimant.email}">email</div>
+                                </td>
+                                <td th:text="${#temporals.format(c.createdAt, 'MMM dd, yyyy HH:mm')}">Date</td>
+                                <td>
+                                    <a th:href="@{'/claims/review/' + ${c.id}}" class="btn btn-sm btn-primary">
+                                        Review Proof &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:unless="${pendingClaims != null && !pendingClaims.isEmpty()}" class="empty-state">
+                    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 class="empty-state-title">No pending claims in the queue</h3>
+                    <p class="empty-state-text">All ownership claims across campus have been verified or resolved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Item Moderation -->
+    <div id="items-tab" class="tab-pane" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 style="font-size: 1.15rem; margin-bottom: 0.25rem;">Campus Item Reports Directory</h3>
+                    <p class="text-muted" style="margin-bottom: 0; font-size: 0.85rem;">Inspect and remove inappropriate or duplicate reports from the public catalog.</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div th:if="${items != null && items.hasContent()}" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Reporter</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Moderate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="it : ${items.content}">
+                                <td>#<span th:text="${it.id}">1</span></td>
+                                <td>
+                                    <a th:href="@{'/items/' + ${it.id}}" th:text="${it.title}" style="font-weight: 600;">Title</a>
+                                </td>
+                                <td>
+                                    <span th:class="'badge ' + (${it.lost} ? 'badge-lost' : 'badge-found')"
+                                          th:text="${it.type.displayName}">Type</span>
+                                </td>
+                                <td><span class="badge badge-category" th:text="${it.category.displayName}">Category</span></td>
+                                <td th:text="${it.user.fullName}">User</td>
+                                <td>
+                                    <span th:class="'badge ' + (${it.status.name() == 'OPEN'} ? 'badge-open' : (${it.status.name() == 'CLAIM_PENDING'} ? 'badge-pending' : 'badge-resolved'))"
+                                          th:text="${it.status.displayName}">Status</span>
+                                </td>
+                                <td th:text="${#temporals.format(it.eventDate, 'MMM dd, yyyy')}">Date</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{'/items/' + ${it.id}}" class="btn btn-sm btn-outline-navy">View</a>
+                                        <a th:href="@{'/items/edit/' + ${it.id}}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <form th:action="@{'/admin/items/' + ${it.id} + '/delete'}" method="post" style="display: inline;">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Permanently remove this report?');">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Items Pagination -->
+                <nav th:if="${items != null && items.totalPages > 1}" class="mt-4" aria-label="Item pagination">
+                    <ul class="pagination">
+                        <li th:class="'page-item ' + (${items.first} ? 'disabled' : '')">
+                            <a class="page-link" th:href="@{/admin/dashboard(itemPage=${items.number - 1})}#items-tab">&laquo; Prev</a>
+                        </li>
+                        <li th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}"
+                            th:class="'page-item ' + (${i == items.number} ? 'active' : '')">
+                            <a class="page-link" th:href="@{/admin/dashboard(itemPage=${i})}#items-tab" th:text="${i + 1}">1</a>
+                        </li>
+                        <li th:class="'page-item ' + (${items.last} ? 'disabled' : '')">
+                            <a class="page-link" th:href="@{/admin/dashboard(itemPage=${items.number + 1})}#items-tab">Next &raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: User Directory & Role Management -->
+    <div id="users-tab" class="tab-pane" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 style="font-size: 1.15rem; margin-bottom: 0.25rem;">Registered Campus Users</h3>
+                    <p class="text-muted" style="margin-bottom: 0; font-size: 0.85rem;">Manage account statuses and role authorization.</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div th:if="${users != null && users.hasContent()}" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th>Account Status</th>
+                                <th>Registered</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="u : ${users.content}">
+                                <td>
+                                    <strong th:text="${u.fullName}">Full Name</strong>
+                                </td>
+                                <td th:text="${u.email}">user@campus.edu</td>
+                                <td th:text="${u.phone != null ? u.phone : '-'}">-</td>
+                                <td>
+                                    <span th:class="'badge ' + (${u.admin} ? 'badge-admin' : 'badge-open')"
+                                          th:text="${u.role.name()}">ROLE_USER</span>
+                                </td>
+                                <td>
+                                    <span th:class="'badge ' + (${u.enabled} ? 'badge-resolved' : 'badge-withdrawn')"
+                                          th:text="${u.enabled ? 'Active' : 'Disabled'}">Active</span>
+                                </td>
+                                <td th:text="${#temporals.format(u.createdAt, 'MMM dd, yyyy')}">Date</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <!-- Toggle Status (Enabled/Disabled) -->
+                                        <form th:action="@{'/admin/users/' + ${u.id} + '/toggle-status'}" method="post" style="display: inline;">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                            <button type="submit" class="btn btn-sm btn-outline-navy"
+                                                    th:disabled="${u.id == currentUser.id}"
+                                                    th:text="${u.enabled ? 'Disable' : 'Enable'}">
+                                                Disable
+                                            </button>
+                                        </form>
+
+                                        <!-- Toggle Role (Promote/Demote Admin) -->
+                                        <form th:action="@{'/admin/users/' + ${u.id} + '/toggle-role'}" method="post" style="display: inline;">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary"
+                                                    th:disabled="${u.id == currentUser.id}"
+                                                    th:text="${u.admin ? 'Demote' : 'Make Admin'}">
+                                                Make Admin
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Users Pagination -->
+                <nav th:if="${users != null && users.totalPages > 1}" class="mt-4" aria-label="User pagination">
+                    <ul class="pagination">
+                        <li th:class="'page-item ' + (${users.first} ? 'disabled' : '')">
+                            <a class="page-link" th:href="@{/admin/dashboard(userPage=${users.number - 1})}#users-tab">&laquo; Prev</a>
+                        </li>
+                        <li th:each="i : ${#numbers.sequence(0, users.totalPages - 1)}"
+                            th:class="'page-item ' + (${i == users.number} ? 'active' : '')">
+                            <a class="page-link" th:href="@{/admin/dashboard(userPage=${i})}#users-tab" th:text="${i + 1}">1</a>
+                        </li>
+                        <li th:class="'page-item ' + (${users.last} ? 'disabled' : '')">
+                            <a class="page-link" th:href="@{/admin/dashboard(userPage=${users.number + 1})}#users-tab">Next &raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

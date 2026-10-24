@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{})}">
+<head>
+    <title>Browse Items | FindIt</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h1>Browse Campus Items</h1>
+            <p class="text-muted" style="margin-bottom: 0;">Search through active lost and found reports across the university.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/items/report/lost}" class="btn btn-outline-navy">+ Report Lost</a>
+            <a th:href="@{/items/report/found}" class="btn btn-primary">+ Report Found</a>
+        </div>
+    </div>
+
+    <!-- Filter & Search Card -->
+    <div class="filter-bar-card">
+        <form th:action="@{/items}" method="get" id="filterForm">
+            <div class="filter-grid">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="q" class="form-label" style="font-size: 0.8rem;">Keyword Search</label>
+                    <input type="text" id="q" name="q" th:value="${filter.q}" class="form-control" placeholder="Search title, brand, details...">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="type" class="form-label" style="font-size: 0.8rem;">Report Type</label>
+                    <select id="type" name="type" class="form-control">
+                        <option value="">All Types</option>
+                        <option th:each="t : ${types}" th:value="${t}" th:text="${t.displayName}" th:selected="${filter.type == t}">Lost</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="category" class="form-label" style="font-size: 0.8rem;">Category</label>
+                    <select id="category" name="category" class="form-control">
+                        <option value="">All Categories</option>
+                        <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}" th:selected="${filter.category == cat}">Category</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="sort" class="form-label" style="font-size: 0.8rem;">Sort By</label>
+                    <select id="sort" name="sort" class="form-control">
+                        <option value="newest" th:selected="${filter.sort == 'newest'}">Newest First</option>
+                        <option value="oldest" th:selected="${filter.sort == 'oldest'}">Oldest First</option>
+                        <option value="eventDateDesc" th:selected="${filter.sort == 'eventDateDesc'}">Event Date (Latest)</option>
+                        <option value="eventDateAsc" th:selected="${filter.sort == 'eventDateAsc'}">Event Date (Earliest)</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="height: 42px;">Filter</button>
+                    <a th:href="@{/items}" class="btn btn-outline-navy" style="height: 42px;" title="Reset filters">Reset</a>
+                </div>
+            </div>
+
+            <!-- Expandable Advanced Filters (Location & Color) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--color-slate-100);">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="location" class="form-label" style="font-size: 0.8rem;">Campus Location</label>
+                    <input type="text" id="location" name="location" th:value="${filter.location}" class="form-control" placeholder="e.g. Science Library, Gym">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="color" class="form-label" style="font-size: 0.8rem;">Color</label>
+                    <input type="text" id="color" name="color" th:value="${filter.color}" class="form-control" placeholder="e.g. Blue, Black, Silver">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="status" class="form-label" style="font-size: 0.8rem;">Status</label>
+                    <select id="status" name="status" class="form-control">
+                        <option value="">Active (Open & Claim Pending)</option>
+                        <option value="OPEN" th:selected="${filter.status != null && filter.status.name() == 'OPEN'}">Open Only</option>
+                        <option value="CLAIM_PENDING" th:selected="${filter.status != null && filter.status.name() == 'CLAIM_PENDING'}">Claim Pending</option>
+                        <option value="RESOLVED" th:selected="${filter.status != null && filter.status.name() == 'RESOLVED'}">Resolved / Returned</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Grid -->
+    <div th:if="${itemPage != null && itemPage.hasContent()}" class="items-grid">
+        <div th:each="item : ${itemPage.content}" class="card item-card">
+            <div class="item-card-media">
+                <img th:if="${item.imageUrl != null}" th:src="@{${item.imageUrl}}" th:alt="${item.title}" class="item-card-img">
+                <div th:unless="${item.imageUrl != null}" class="item-card-media-placeholder">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span style="font-size: 0.8rem; margin-top: 0.25rem; font-weight: 600;">No photo attached</span>
+                </div>
+
+                <div class="item-card-badges">
+                    <span th:if="${item.lost}" class="badge badge-lost">Lost</span>
+                    <span th:if="${item.found}" class="badge badge-found">Found</span>
+                    <span class="badge badge-category" th:text="${item.category.displayName}">Category</span>
+                </div>
+
+                <div class="item-card-status">
+                    <span th:class="'badge ' + (${item.status.name() == 'OPEN'} ? 'badge-open' : (${item.status.name() == 'CLAIM_PENDING'} ? 'badge-pending' : 'badge-resolved'))"
+                          th:text="${item.status.displayName}">Status</span>
+                </div>
+            </div>
+
+            <div class="item-card-content">
+                <h3 class="item-card-title">
+                    <a th:href="@{'/items/' + ${item.id}}" th:text="${item.title}">Item Title</a>
+                </h3>
+
+                <div class="item-meta-row">
+                    <svg class="item-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span th:text="${item.location}">Location</span>
+                </div>
+
+                <div class="item-meta-row">
+                    <svg class="item-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span>Date: <strong th:text="${#temporals.format(item.eventDate, 'MMM dd, yyyy')}">Oct 20, 2026</strong></span>
+                </div>
+
+                <div th:if="${item.color != null && !item.color.empty}" class="item-meta-row">
+                    <svg class="item-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"></circle></svg>
+                    <span>Color: <strong th:text="${item.color}">Color</strong></span>
+                </div>
+
+                <div class="item-card-actions">
+                    <a th:href="@{'/items/' + ${item.id}}" class="btn btn-sm btn-outline-navy">View Details</a>
+                    <a th:if="${item.found && item.status.name() == 'OPEN'}" th:href="@{'/items/' + ${item.id} + '/claim'}" class="btn btn-sm btn-primary">Claim</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:unless="${itemPage != null && itemPage.hasContent()}" class="empty-state">
+        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <h3 class="empty-state-title">No matching reports found</h3>
+        <p class="empty-state-text">Try adjusting your filters, clearing keyword restrictions, or post a new report.</p>
+        <a th:href="@{/items}" class="btn btn-outline-navy">Clear Filters</a>
+    </div>
+
+    <!-- Pagination -->
+    <nav th:if="${itemPage != null && itemPage.totalPages > 1}" aria-label="Page navigation">
+        <ul class="pagination">
+            <li th:class="'page-item ' + (${itemPage.first} ? 'disabled' : '')">
+                <a class="page-link" th:href="@{/items(page=${itemPage.number - 1}, size=${filter.size}, q=${filter.q}, type=${filter.type}, category=${filter.category}, location=${filter.location}, color=${filter.color}, sort=${filter.sort})}">&laquo; Prev</a>
+            </li>
+
+            <li th:each="i : ${#numbers.sequence(0, itemPage.totalPages - 1)}"
+                th:class="'page-item ' + (${i == itemPage.number} ? 'active' : '')">
+                <a class="page-link" th:href="@{/items(page=${i}, size=${filter.size}, q=${filter.q}, type=${filter.type}, category=${filter.category}, location=${filter.location}, color=${filter.color}, sort=${filter.sort})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+
+            <li th:class="'page-item ' + (${itemPage.last} ? 'disabled' : '')">
+                <a class="page-link" th:href="@{/items(page=${itemPage.number + 1}, size=${filter.size}, q=${filter.q}, type=${filter.type}, category=${filter.category}, location=${filter.location}, color=${filter.color}, sort=${filter.sort})}">Next &raquo;</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html>

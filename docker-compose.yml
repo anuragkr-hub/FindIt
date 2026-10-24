@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: findit-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: findit_db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - findit-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: findit-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/findit_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      APP_UPLOAD_DIR: /app/uploads
+      APP_SEED_DATA: "true"
+    volumes:
+      - app_uploads:/app/uploads
+    networks:
+      - findit-network
+
+volumes:
+  mysql_data:
+  app_uploads:
+
+networks:
+  findit-network:
+    driver: bridge

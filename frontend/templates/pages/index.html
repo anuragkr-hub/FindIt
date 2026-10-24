@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{})}">
+<head>
+    <title>FindIt | Campus Lost and Found Platform</title>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Hero Section -->
+    <section class="card mb-5" style="background: linear-gradient(135deg, var(--color-navy-900) 0%, #1e3a8a 100%); color: white; border: none; padding: 3rem 2rem; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl);">
+        <div class="hero-grid" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3rem; align-items: center;">
+            <div>
+                <span class="badge" style="background: rgba(255,255,255,0.15); color: #93c5fd; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 1rem; font-size: 0.85rem; padding: 0.35rem 0.85rem;">
+                    Official Campus Lost & Found
+                </span>
+                <h1 style="color: white; font-size: 2.75rem; font-weight: 800; line-height: 1.15; margin-bottom: 1.25rem;">
+                    Lost something on campus? <br>
+                    <span style="color: #60a5fa;">We'll help you find it.</span>
+                </h1>
+                <p style="color: #cbd5e1; font-size: 1.15rem; margin-bottom: 2rem; max-width: 540px;">
+                    Report lost belongings, register items you've found, and let our deterministic weighted matching system connect items with their rightful owners safely.
+                </p>
+
+                <div class="hero-actions d-flex gap-3 flex-wrap">
+                    <a th:href="@{/items/report/lost}" class="btn btn-lg" style="background-color: #f59e0b; color: #1e1e1e; border: none; font-weight: 700;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        I Lost an Item
+                    </a>
+                    <a th:href="@{/items/report/found}" class="btn btn-lg btn-primary" style="background-color: #2563eb;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        I Found an Item
+                    </a>
+                    <a th:href="@{/items}" class="btn btn-lg btn-outline-navy" style="color: white; border-color: rgba(255,255,255,0.4);">
+                        Browse All Items
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Search Card on Hero -->
+            <div class="card" style="background: white; color: var(--color-slate-800); padding: 1.75rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--color-navy-900);">Search Campus Property</h3>
+                <p style="font-size: 0.875rem; color: var(--color-slate-500); margin-bottom: 1.25rem;">Quickly check if your item was already turned in.</p>
+
+                <form th:action="@{/items}" method="get">
+                    <div class="form-group mb-3">
+                        <label for="heroQ" class="form-label" style="font-size: 0.85rem;">Keywords / Item Description</label>
+                        <input type="text" id="heroQ" name="q" class="form-control" placeholder="e.g. MacBook, keys, Hydro Flask, jacket...">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="heroType" class="form-label" style="font-size: 0.85rem;">I am looking for...</label>
+                        <select id="heroType" name="type" class="form-control">
+                            <option value="">All Categories (Lost & Found)</option>
+                            <option value="FOUND">Items Reported Found (Recovered)</option>
+                            <option value="LOST">Items Reported Lost</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><path d="M21 21l-4.35-4.35" stroke-width="2"></path></svg>
+                        Search Database
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Campus Recovery Metrics -->
+    <section class="mb-5">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-blue">
+                    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                </div>
+                <div>
+                    <div class="stat-value" th:text="${stats.totalReports}">0</div>
+                    <div class="stat-label">Total Reports Logged</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-amber">
+                    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <div>
+                    <div class="stat-value" th:text="${stats.openLostCount}">0</div>
+                    <div class="stat-label">Active Lost Reports</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-green">
+                    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <div class="stat-value" th:text="${stats.openFoundCount}">0</div>
+                    <div class="stat-label">Items Awaiting Claim</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper stat-icon-navy">
+                    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                    <div class="stat-value"><span th:text="${stats.recoveryRate}">0</span>%</div>
+                    <div class="stat-label">Campus Return Rate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Items Section -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2>Recently Reported Items</h2>
+                <p class="text-muted" style="margin-bottom: 0;">Latest items posted by students, faculty, and staff.</p>
+            </div>
+            <a th:href="@{/items}" class="btn btn-outline-navy">View All Items &rarr;</a>
+        </div>
+
+        <div th:if="${recentItems != null && !recentItems.isEmpty()}" class="items-grid">
+            <div th:each="item : ${recentItems}" class="card item-card">
+                <div class="item-card-media">
+                    <img th:if="${item.imageUrl != null}" th:src="@{${item.imageUrl}}" th:alt="${item.title}" class="item-card-img">
+                    <div th:unless="${item.imageUrl != null}" class="item-card-media-placeholder">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span style="font-size: 0.8rem; margin-top: 0.25rem; font-weight: 600;">No photo</span>
+                    </div>
+
+                    <div class="item-card-badges">
+                        <span th:if="${item.lost}" class="badge badge-lost">Lost</span>
+                        <span th:if="${item.found}" class="badge badge-found">Found</span>
+                        <span class="badge badge-category" th:text="${item.category.displayName}">Category</span>
+                    </div>
+
+                    <div class="item-card-status">
+                        <span th:class="'badge ' + (${item.status.name() == 'OPEN'} ? 'badge-open' : (${item.status.name() == 'CLAIM_PENDING'} ? 'badge-pending' : 'badge-resolved'))"
+                              th:text="${item.status.displayName}">Status</span>
+                    </div>
+                </div>
+
+                <div class="item-card-content">
+                    <h3 class="item-card-title">
+                        <a th:href="@{'/items/' + ${item.id}}" th:text="${item.title}">Item Title</a>
+                    </h3>
+
+                    <div class="item-meta-row">
+                        <svg class="item-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span th:text="${item.location}">Campus Location</span>
+                    </div>
+
+                    <div class="item-meta-row">
+                        <svg class="item-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span>Date: <strong th:text="${#temporals.format(item.eventDate, 'MMM dd, yyyy')}">Oct 20, 2026</strong></span>
+                    </div>
+
+                    <div th:if="${item.color != null && !item.color.empty}" class="item-meta-row">
+                        <svg class="item-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"></circle></svg>
+                        <span>Color: <strong th:text="${item.color}">Color</strong></span>
+                    </div>
+
+                    <div class="item-card-actions">
+                        <a th:href="@{'/items/' + ${item.id}}" class="btn btn-sm btn-outline-navy">View Details</a>
+                        <a th:if="${item.found && item.status.name() == 'OPEN'}" th:href="@{'/items/' + ${item.id} + '/claim'}" class="btn btn-sm btn-primary">Claim</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:unless="${recentItems != null && !recentItems.isEmpty()}" class="empty-state">
+            <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><path d="M21 21l-4.35-4.35" stroke-width="2"></path></svg>
+            <h3 class="empty-state-title">No reports published yet</h3>
+            <p class="empty-state-text">Be the first to report a lost or found item on campus.</p>
+            <a th:href="@{/items/report/lost}" class="btn btn-primary">Report an Item</a>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="card p-5" style="background-color: var(--color-white); border-radius: var(--radius-xl);">
+        <div class="text-center mb-5">
+            <span class="badge badge-category" style="margin-bottom: 0.5rem;">Transparent & Reliable</span>
+            <h2>How FindIt Deterministic Matching Works</h2>
+            <p class="text-muted" style="max-width: 600px; margin: 0 auto;">
+                Unlike vague keyword searches, FindIt evaluates compatible Lost and Found reports with strict, calibrated scoring criteria.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2rem; font-weight: 800; color: var(--color-blue-600); margin-bottom: 0.25rem;">30%</div>
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem;">Category</h4>
+                <p style="font-size: 0.85rem; color: var(--color-slate-600);">Exact match across categorized campus item types, with partial points for related tech/accessories.</p>
+            </div>
+
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2rem; font-weight: 800; color: var(--color-blue-600); margin-bottom: 0.25rem;">20%</div>
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem;">Color</h4>
+                <p style="font-size: 0.85rem; color: var(--color-slate-600);">Normalized token matching. If either report omits a color, 0 points are awarded without false inflation.</p>
+            </div>
+
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2rem; font-weight: 800; color: var(--color-blue-600); margin-bottom: 0.25rem;">20%</div>
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem;">Location</h4>
+                <p style="font-size: 0.85rem; color: var(--color-slate-600);">Campus landmark and building token overlap (e.g. Science Library, Student Union, Gym).</p>
+            </div>
+
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2rem; font-weight: 800; color: var(--color-blue-600); margin-bottom: 0.25rem;">15%</div>
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem;">Date Proximity</h4>
+                <p style="font-size: 0.85rem; color: var(--color-slate-600);">Same day = 15 pts, within 3 days = 12 pts, decreasing with calendar distance.</p>
+            </div>
+
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2rem; font-weight: 800; color: var(--color-blue-600); margin-bottom: 0.25rem;">15%</div>
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem;">Description</h4>
+                <p style="font-size: 0.85rem; color: var(--color-slate-600);">Stopword-filtered token set similarity (brands, serial patterns, stickers, unique features).</p>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

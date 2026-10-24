@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{})}">
+<head>
+    <title>Review Ownership Claim | FindIt</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div style="max-width: 820px; margin: 0 auto;">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <div style="font-size: 0.9rem; color: var(--color-slate-500); display: flex; gap: 0.5rem; align-items: center;">
+                <a th:href="@{/dashboard}">Dashboard</a> &rsaquo;
+                <a th:href="@{'/items/' + ${item.id}}" th:text="${item.title}">Item</a> &rsaquo;
+                <span style="color: var(--color-navy-900); font-weight: 600;">Review Claim #<span th:text="${claim.id}">1</span></span>
+            </div>
+        </nav>
+
+        <!-- Claim Header Banner -->
+        <div class="card mb-4" style="background: white;">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <div>
+                        <span th:class="'badge ' + (${claim.pending} ? 'badge-pending' : (${claim.approved} ? 'badge-resolved' : 'badge-withdrawn'))"
+                              th:text="${claim.status.displayName}">Pending Review</span>
+                        <h2 style="font-size: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.25rem;">
+                            Ownership Claim for "<span th:text="${item.title}">Item</span>"
+                        </h2>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--color-slate-500);">
+                        Submitted on: <strong th:text="${#temporals.format(claim.createdAt, 'MMM dd, yyyy HH:mm')}">Date</strong>
+                    </div>
+                </div>
+
+                <!-- Claimant Profile Box -->
+                <div style="background-color: var(--color-slate-50); border: 1px solid var(--color-slate-200); border-radius: var(--radius-md); padding: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div>
+                        <span class="text-muted" style="font-size: 0.8rem; display: block;">Claimant Name</span>
+                        <strong style="color: var(--color-navy-900); font-size: 1rem;" th:text="${claim.claimant.fullName}">Full Name</strong>
+                    </div>
+                    <div>
+                        <span class="text-muted" style="font-size: 0.8rem; display: block;">Email</span>
+                        <strong style="color: var(--color-navy-900); font-size: 0.95rem;" th:text="${claim.claimant.email}">user@campus.edu</strong>
+                    </div>
+                    <div>
+                        <span class="text-muted" style="font-size: 0.8rem; display: block;">Contact Phone</span>
+                        <strong style="color: var(--color-navy-900); font-size: 0.95rem;" th:text="${claim.contactPhone != null ? claim.contactPhone : 'Not provided'}">555-0199</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submitted Private Proof Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 style="font-size: 1.15rem; margin-bottom: 0;">Claimant's Private Proof of Ownership</h3>
+            </div>
+            <div class="card-body">
+                <div style="background: white; border: 1px solid var(--color-slate-200); border-radius: var(--radius-md); padding: 1.5rem; font-size: 1rem; line-height: 1.7; color: var(--color-slate-800); white-space: pre-line;"
+                     th:text="${claim.proofDescription}">
+                    Private proof text...
+                </div>
+            </div>
+        </div>
+
+        <!-- Previous Review Decision (If already reviewed) -->
+        <div th:unless="${claim.pending}" class="card mb-4" style="border-left: 4px solid var(--color-blue-600);">
+            <div class="card-body">
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Review Decision Recorded</h4>
+                <p style="margin-bottom: 0.5rem;">
+                    Status: <strong th:text="${claim.status.displayName}">Approved</strong>
+                </p>
+                <p style="margin-bottom: 0;" th:if="${claim.reviewerNotes != null && !claim.reviewerNotes.empty}">
+                    Reviewer Notes: <span th:text="${claim.reviewerNotes}">Notes</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Decision Form Card (Only active if Pending) -->
+        <div th:if="${claim.pending}" class="card">
+            <div class="card-header">
+                <h3 style="font-size: 1.15rem; margin-bottom: 0;">Make Verification Decision</h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{'/claims/review/' + ${claim.id}}" th:object="${reviewDto}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <!-- Action Radios -->
+                    <div class="form-group mb-4">
+                        <label class="form-label" style="margin-bottom: 0.75rem;">Decision Action <span class="required">*</span></label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border: 2px solid var(--color-success-border); background-color: var(--color-success-bg); border-radius: var(--radius-md); cursor: pointer;">
+                                <input type="radio" name="action" value="APPROVE" checked style="margin-top: 0.2rem;">
+                                <div>
+                                    <strong style="color: var(--color-success-text); display: block;">Approve Claim (Verified)</strong>
+                                    <span style="font-size: 0.825rem; color: var(--color-slate-600);">The proof matches the item. This item will transition to Resolved / Returned.</span>
+                                </div>
+                            </label>
+
+                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border: 2px solid var(--color-danger-border); background-color: var(--color-danger-bg); border-radius: var(--radius-md); cursor: pointer;">
+                                <input type="radio" name="action" value="REJECT" style="margin-top: 0.2rem;">
+                                <div>
+                                    <strong style="color: var(--color-danger-text); display: block;">Reject Claim (Unverified)</strong>
+                                    <span style="font-size: 0.825rem; color: var(--color-slate-600);">The evidence is insufficient or does not match. The item will remain open for others.</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Reviewer Notes -->
+                    <div class="form-group mb-4">
+                        <label for="reviewerNotes" class="form-label">
+                            Message to Claimant / Safe Exchange Instructions
+                        </label>
+                        <textarea id="reviewerNotes" th:field="*{reviewerNotes}" rows="3" class="form-control"
+                                  placeholder="For approved claims: provide campus pickup instructions (e.g. 'Please meet at the Science Library Circulation Desk on weekdays between 9am-5pm with your student ID'). For rejections: explain politely why verification was inconclusive."></textarea>
+                        <div class="form-text">This note will be delivered directly to the claimant via in-app notification.</div>
+                    </div>
+
+                    <!-- Submit Actions -->
+                    <div class="d-flex justify-content-between align-items-center pt-3" style="border-top: 1px solid var(--color-slate-200);">
+                        <a th:href="@{'/items/' + ${item.id}}" class="btn btn-outline-navy">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg" onclick="return confirm('Confirm your review decision for this claim?');">
+                            Submit Decision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

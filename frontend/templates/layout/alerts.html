@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<div th:fragment="alerts">
+    <!-- Success Alert -->
+    <div th:if="${successMessage != null}" class="alert alert-success" role="alert">
+        <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div style="flex: 1;" th:text="${successMessage}">Operation completed successfully.</div>
+        <button type="button" class="alert-dismiss-btn" aria-label="Dismiss alert">&times;</button>
+    </div>
+
+    <!-- Error Alert -->
+    <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
+        <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div style="flex: 1;" th:text="${errorMessage}">An error occurred while processing your request.</div>
+        <button type="button" class="alert-dismiss-btn" aria-label="Dismiss alert">&times;</button>
+    </div>
+
+    <!-- Warning Alert -->
+    <div th:if="${warningMessage != null}" class="alert alert-warning" role="alert">
+        <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <div style="flex: 1;" th:text="${warningMessage}">Please review the warning notice.</div>
+        <button type="button" class="alert-dismiss-btn" aria-label="Dismiss alert">&times;</button>
+    </div>
+
+    <!-- Info Alert -->
+    <div th:if="${infoMessage != null}" class="alert alert-info" role="alert">
+        <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div style="flex: 1;" th:text="${infoMessage}">Information notice.</div>
+        <button type="button" class="alert-dismiss-btn" aria-label="Dismiss alert">&times;</button>
+    </div>
+</div>
+</body>
+</html>

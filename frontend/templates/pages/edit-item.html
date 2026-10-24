@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{::script})}">
+<head>
+    <title>Edit Item Report | FindIt</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div style="max-width: 760px; margin: 0 auto;">
+        <!-- Header -->
+        <div class="mb-4">
+            <a th:href="@{'/items/' + ${item.id}}" style="font-size: 0.9rem; color: var(--color-slate-500); display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.5rem;">
+                &larr; Back to Item Details
+            </a>
+            <h1>Edit Item Report</h1>
+            <p class="text-muted">Update information for report #<span th:text="${item.id}">1</span> (<strong th:text="${item.type.displayName}">Lost</strong>).</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{'/items/edit/' + ${item.id}}" th:object="${itemDto}" method="post" enctype="multipart/form-data" novalidate>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" th:field="*{type}" />
+                    <input type="hidden" th:field="*{id}" />
+
+                    <!-- Item Title -->
+                    <div class="form-group mb-3">
+                        <label for="title" class="form-label">Item Title <span class="required">*</span></label>
+                        <input type="text" id="title" th:field="*{title}"
+                               th:class="'form-control ' + (${#fields.hasErrors('title')} ? 'is-invalid' : '')">
+                        <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="invalid-feedback">Title is required</div>
+                    </div>
+
+                    <!-- Category & Color -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" class="mb-3">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="category" class="form-label">Category <span class="required">*</span></label>
+                            <select id="category" th:field="*{category}"
+                                    th:class="'form-control ' + (${#fields.hasErrors('category')} ? 'is-invalid' : '')">
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}">Category</option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="invalid-feedback">Category is required</div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="color" class="form-label">Color</label>
+                            <input type="text" id="color" th:field="*{color}"
+                                   th:class="'form-control ' + (${#fields.hasErrors('color')} ? 'is-invalid' : '')">
+                            <div th:if="${#fields.hasErrors('color')}" th:errors="*{color}" class="invalid-feedback">Invalid color</div>
+                        </div>
+                    </div>
+
+                    <!-- Location & Date -->
+                    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem;" class="mb-3">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="location" class="form-label">Campus Location <span class="required">*</span></label>
+                            <input type="text" id="location" th:field="*{location}"
+                                   th:class="'form-control ' + (${#fields.hasErrors('location')} ? 'is-invalid' : '')">
+                            <div th:if="${#fields.hasErrors('location')}" th:errors="*{location}" class="invalid-feedback">Location is required</div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="eventDate" class="form-label">Event Date <span class="required">*</span></label>
+                            <input type="date" id="eventDate" th:field="*{eventDate}"
+                                   th:class="'form-control ' + (${#fields.hasErrors('eventDate')} ? 'is-invalid' : '')">
+                            <div th:if="${#fields.hasErrors('eventDate')}" th:errors="*{eventDate}" class="invalid-feedback">Date is required</div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group mb-3">
+                        <label for="description" class="form-label">Detailed Description <span class="required">*</span></label>
+                        <textarea id="description" th:field="*{description}" rows="4"
+                                  th:class="'form-control ' + (${#fields.hasErrors('description')} ? 'is-invalid' : '')"></textarea>
+                        <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="invalid-feedback">Description is required</div>
+                    </div>
+
+                    <!-- Current & Replacement Image -->
+                    <div class="form-group mb-4">
+                        <label for="imageFile" class="form-label">Update Photo (Optional)</label>
+                        <div th:if="${itemDto.existingImageUrl != null}" class="d-flex align-items-center gap-3 mb-2 p-2" style="background: var(--color-slate-50); border: 1px solid var(--color-slate-200); border-radius: var(--radius-md);">
+                            <img th:src="@{${itemDto.existingImageUrl}}" alt="Current photo" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm);">
+                            <span style="font-size: 0.85rem; color: var(--color-slate-600);">Current photo attached. Uploading a new file will replace it.</span>
+                        </div>
+                        <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/png, image/jpeg, image/webp, image/gif">
+
+                        <!-- Preview -->
+                        <div id="imagePreviewContainer" style="display: none; align-items: center; gap: 1rem; margin-top: 0.75rem; padding: 0.75rem; background: var(--color-slate-50); border-radius: var(--radius-md); border: 1px solid var(--color-slate-200);">
+                            <img id="imagePreview" src="" alt="Selected Preview" style="width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm);">
+                            <div>
+                                <span style="font-size: 0.85rem; font-weight: 600; display: block;">Replacement photo ready</span>
+                                <button type="button" id="removeImageBtn" class="btn btn-sm btn-outline-danger" style="margin-top: 0.25rem;">Cancel Replacement</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between align-items-center pt-3" style="border-top: 1px solid var(--color-slate-200);">
+                        <a th:href="@{'/items/' + ${item.id}}" class="btn btn-outline-navy">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="script">
+    <script th:src="@{/js/items.js}"></script>
+</th:block>
+</body>
+</html>

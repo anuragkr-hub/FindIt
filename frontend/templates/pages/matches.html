@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{::script})}">
+<head>
+    <title>Potential Match Suggestions | FindIt</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="mb-4">
+        <h1>Deterministic Match Suggestions</h1>
+        <p class="text-muted">
+            Our multi-attribute algorithm compares compatible Lost and Found reports using calibrated campus weights.
+        </p>
+    </div>
+
+    <!-- Legal / Algorithmic Disclaimer Alert -->
+    <div class="alert alert-info mb-4" role="alert">
+        <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+            <strong>Notice Regarding Match Scores:</strong> Scores are algorithmic suggestions intended to assist community discovery. A high score does not constitute verified proof of ownership. All claims must undergo private owner or staff review.
+        </div>
+    </div>
+
+    <!-- Case 1: Viewing Matches for a Single Target Item -->
+    <div th:if="${targetItem != null}">
+        <!-- Target Item Summary Banner -->
+        <div class="card mb-4" style="background-color: var(--color-navy-900); color: white;">
+            <div class="card-body">
+                <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; font-weight: 700;">Matching Target Report</span>
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1">
+                    <div>
+                        <h2 style="color: white; font-size: 1.5rem; margin-bottom: 0.25rem;" th:text="${targetItem.title}">Target Item</h2>
+                        <div style="font-size: 0.85rem; color: #cbd5e1;">
+                            Type: <strong th:text="${targetItem.type.displayName}">Lost</strong> &bull;
+                            Category: <strong th:text="${targetItem.category.displayName}">Category</strong> &bull;
+                            Location: <strong th:text="${targetItem.location}">Location</strong> &bull;
+                            Date: <strong th:text="${#temporals.format(targetItem.eventDate, 'MMM dd, yyyy')}">Date</strong>
+                        </div>
+                    </div>
+                    <a th:href="@{'/items/' + ${targetItem.id}}" class="btn btn-sm btn-outline-navy" style="color: white; border-color: rgba(255,255,255,0.4);">
+                        View Original Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matches Results List -->
+        <div th:if="${matches != null && !matches.isEmpty()}" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div th:each="m : ${matches}" class="card">
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: 140px 1fr 280px; gap: 1.5rem; align-items: start;">
+                        <!-- Score Visual Ring / Badge -->
+                        <div style="text-align: center; padding: 0.5rem; background: var(--color-slate-50); border-radius: var(--radius-lg); border: 1px solid var(--color-slate-200);">
+                            <div style="font-size: 2.25rem; font-weight: 800; line-height: 1;"
+                                 th:class="${m.totalScore >= 75 ? 'text-success' : (m.totalScore >= 45 ? 'text-primary' : 'text-muted')}"
+                                 th:text="${m.totalScore + '%'}">85%</div>
+                            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-top: 0.35rem;"
+                                  th:class="${m.totalScore >= 75 ? 'text-success' : 'text-muted'}"
+                                  th:text="${m.confidenceLevel + ' CONFIDENCE'}">HIGH CONFIDENCE</span>
+
+                            <div class="score-progress-bar" style="margin-top: 0.75rem;">
+                                <div class="score-progress-fill"
+                                     th:classappend="${m.totalScore >= 75 ? 'fill-high' : (m.totalScore >= 45 ? 'fill-medium' : 'fill-low')}"
+                                     th:data-target-width="${m.totalScore + '%'}"
+                                     th:style="'width: ' + ${m.totalScore} + '%;'"></div>
+                            </div>
+                        </div>
+
+                        <!-- Candidate Item Information -->
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span th:class="'badge ' + (${m.candidateItem.lost} ? 'badge-lost' : 'badge-found')"
+                                      th:text="${m.candidateItem.type.displayName}">Found</span>
+                                <span class="badge badge-category" th:text="${m.candidateItem.category.displayName}">Category</span>
+                                <span class="badge badge-open" th:text="${m.candidateItem.status.displayName}">Status</span>
+                            </div>
+
+                            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">
+                                <a th:href="@{'/items/' + ${m.candidateItem.id}}" th:text="${m.candidateItem.title}">Candidate Item Title</a>
+                            </h3>
+
+                            <p style="font-size: 0.9rem; color: var(--color-slate-600); margin-bottom: 0.75rem;" th:text="${m.candidateItem.description}">
+                                Description...
+                            </p>
+
+                            <div style="font-size: 0.85rem; color: var(--color-slate-600); display: flex; gap: 1.25rem; flex-wrap: wrap;">
+                                <div>Location: <strong th:text="${m.candidateItem.location}">Location</strong></div>
+                                <div>Color: <strong th:text="${m.candidateItem.color != null && !m.candidateItem.color.empty ? m.candidateItem.color : 'None'}">Color</strong></div>
+                                <div>Event Date: <strong th:text="${#temporals.format(m.candidateItem.eventDate, 'MMM dd, yyyy')}">Date</strong></div>
+                            </div>
+
+                            <!-- Explanations List -->
+                            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--color-slate-200);">
+                                <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--color-slate-500); display: block; margin-bottom: 0.35rem;">
+                                    Algorithm Scoring Breakdown
+                                </span>
+                                <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.825rem; color: var(--color-slate-600); display: flex; flex-direction: column; gap: 0.2rem;">
+                                    <li th:each="exp : ${m.explanations}" style="display: flex; align-items: center; gap: 0.4rem;">
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--color-blue-600); flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        <span th:text="${exp}">Breakdown item</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Weighted Points Summary Table & Actions -->
+                        <div style="background-color: var(--color-slate-50); border: 1px solid var(--color-slate-200); border-radius: var(--radius-md); padding: 1rem;">
+                            <span style="font-size: 0.8rem; font-weight: 700; color: var(--color-navy-900); display: block; margin-bottom: 0.5rem;">Weighted Points</span>
+                            <table class="breakdown-table mb-3">
+                                <tr>
+                                    <td>Category <span class="breakdown-weight">(30%)</span></td>
+                                    <td class="text-right font-semibold" th:text="${m.categoryScore + ' / 30'}">30 / 30</td>
+                                </tr>
+                                <tr>
+                                    <td>Color <span class="breakdown-weight">(20%)</span></td>
+                                    <td class="text-right font-semibold" th:text="${m.colorScore + ' / 20'}">20 / 20</td>
+                                </tr>
+                                <tr>
+                                    <td>Location <span class="breakdown-weight">(20%)</span></td>
+                                    <td class="text-right font-semibold" th:text="${m.locationScore + ' / 20'}">16 / 20</td>
+                                </tr>
+                                <tr>
+                                    <td>Date <span class="breakdown-weight">(15%)</span></td>
+                                    <td class="text-right font-semibold" th:text="${m.dateScore + ' / 15'}">12 / 15</td>
+                                </tr>
+                                <tr>
+                                    <td>Description <span class="breakdown-weight">(15%)</span></td>
+                                    <td class="text-right font-semibold" th:text="${m.descriptionScore + ' / 15'}">8 / 15</td>
+                                </tr>
+                            </table>
+
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <a th:href="@{'/items/' + ${m.candidateItem.id}}" class="btn btn-sm btn-outline-navy" style="width: 100%;">
+                                    View Report Details
+                                </a>
+                                <a th:if="${m.candidateItem.found && m.candidateItem.status.name() == 'OPEN'}"
+                                   th:href="@{'/items/' + ${m.candidateItem.id} + '/claim'}" class="btn btn-sm btn-primary" style="width: 100%;">
+                                    Submit Claim
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty matches -->
+        <div th:unless="${matches != null && !matches.isEmpty()}" class="empty-state">
+            <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><path d="M21 21l-4.35-4.35" stroke-width="2"></path></svg>
+            <h3 class="empty-state-title">No matching candidates found</h3>
+            <p class="empty-state-text">There are currently no active reports that meet the minimum compatibility threshold for this item.</p>
+            <a th:href="@{/items}" class="btn btn-outline-navy">Browse All Items</a>
+        </div>
+    </div>
+
+    <!-- Case 2: Overview of Matches for All Current User's Active Items -->
+    <div th:unless="${targetItem != null}">
+        <div th:if="${totalMatchesFound > 0}">
+            <div th:each="entry : ${itemMatchesMap}">
+                <div class="card mb-4" style="border-top: 3px solid var(--color-blue-600);">
+                    <div class="card-header">
+                        <div>
+                            <span class="badge badge-category" th:text="${entry.key.type.displayName}">Lost</span>
+                            <h3 style="font-size: 1.25rem; display: inline-block; margin-left: 0.5rem; margin-bottom: 0;">
+                                Matches for "<span th:text="${entry.key.title}">My Item</span>"
+                            </h3>
+                        </div>
+                        <a th:href="@{'/matches/' + ${entry.key.id}}" class="btn btn-sm btn-outline-navy">Deep Breakdown &rarr;</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div th:each="m : ${entry.value}" class="card" style="border: 1px solid var(--color-slate-200);">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span th:class="'match-score-badge ' + (${m.totalScore >= 75} ? 'match-high' : 'match-medium')"
+                                              style="font-size: 0.85rem; padding: 0.25rem 0.6rem;">
+                                            <span th:text="${m.totalScore}">80</span>% Match
+                                        </span>
+                                        <span class="badge badge-category" th:text="${m.candidateItem.category.displayName}">Cat</span>
+                                    </div>
+
+                                    <h4 style="font-size: 1.05rem; margin-bottom: 0.4rem;">
+                                        <a th:href="@{'/items/' + ${m.candidateItem.id}}" th:text="${m.candidateItem.title}">Candidate</a>
+                                    </h4>
+                                    <div style="font-size: 0.85rem; color: var(--color-slate-600); margin-bottom: 0.25rem;" th:text="${m.candidateItem.location}">Location</div>
+                                    <div style="font-size: 0.8rem; color: var(--color-slate-500); margin-bottom: 0.75rem;">
+                                        Date: <span th:text="${#temporals.format(m.candidateItem.eventDate, 'MMM dd, yyyy')}">Date</span>
+                                    </div>
+
+                                    <div class="score-progress-bar mb-3">
+                                        <div class="score-progress-fill"
+                                             th:classappend="${m.totalScore >= 75 ? 'fill-high' : 'fill-medium'}"
+                                             th:style="'width: ' + ${m.totalScore} + '%;'"></div>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{'/items/' + ${m.candidateItem.id}}" class="btn btn-sm btn-outline-navy" style="width: 100%;">View</a>
+                                        <a th:if="${m.candidateItem.found && m.candidateItem.status.name() == 'OPEN'}"
+                                           th:href="@{'/items/' + ${m.candidateItem.id} + '/claim'}" class="btn btn-sm btn-primary" style="width: 100%;">Claim</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:unless="${totalMatchesFound > 0}" class="empty-state">
+            <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <h3 class="empty-state-title">No pending matches detected</h3>
+            <p class="empty-state-text">As new items are posted, FindIt will automatically calculate match scores and notify you immediately.</p>
+            <a th:href="@{/dashboard}" class="btn btn-primary">Return to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="script">
+    <script th:src="@{/js/matches.js}"></script>
+</th:block>
+</body>
+</html>

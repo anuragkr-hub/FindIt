@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<footer class="site-footer" th:fragment="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <!-- Brand & Mission -->
+            <div class="footer-col">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="brand-icon" style="width: 28px; height: 28px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8" stroke-width="2.5"></circle>
+                            <path d="M21 21l-4.35-4.35" stroke-width="2.5" stroke-linecap="round"></path>
+                        </svg>
+                    </div>
+                    <span style="font-weight: 800; font-size: 1.25rem; color: white;">FindIt</span>
+                </div>
+                <p style="color: var(--color-slate-400); font-size: 0.9rem; margin-bottom: 1rem;">
+                    Connecting campus communities to recover lost valuables safely, transparently, and deterministically.
+                </p>
+                <div style="font-size: 0.85rem; color: var(--color-slate-400);">
+                    <span>Campus Safety & Lost Property Center</span>
+                </div>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div class="footer-col">
+                <h5>Quick Links</h5>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}">Home</a></li>
+                    <li><a th:href="@{/items}">Browse All Items</a></li>
+                    <li><a th:href="@{/items/report/lost}">Report Lost Item</a></li>
+                    <li><a th:href="@{/items/report/found}">Report Found Item</a></li>
+                </ul>
+            </div>
+
+            <!-- Community & Account -->
+            <div class="footer-col">
+                <h5>Community</h5>
+                <ul class="footer-links">
+                    <li><a th:href="@{/dashboard}">User Dashboard</a></li>
+                    <li><a th:href="@{/matches}">Smart Matches</a></li>
+                    <li><a th:href="@{/notifications}">Notifications</a></li>
+                    <li><a th:href="@{/login}">Campus Login</a></li>
+                </ul>
+            </div>
+
+            <!-- Safety & Guidelines -->
+            <div class="footer-col">
+                <h5>Safety & Return Protocol</h5>
+                <p style="color: var(--color-slate-400); font-size: 0.85rem; margin-bottom: 0.75rem;">
+                    Always meet in designated campus safe zones (Campus Safety Office or Student Center) to inspect and exchange claimed property.
+                </p>
+                <div style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #60a5fa;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <span>Secure Verification Protocol</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>
+                &copy; <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2026</span> FindIt Platform. Built for University & Campus Public Spaces.
+            </div>
+            <div style="display: flex; gap: 1.5rem;">
+                <a href="#" style="color: var(--color-slate-400);">Privacy Policy</a>
+                <a href="#" style="color: var(--color-slate-400);">Terms of Service</a>
+                <a href="#" style="color: var(--color-slate-400);">Security Standards</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

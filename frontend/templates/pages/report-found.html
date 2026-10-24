@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{::script})}">
+<head>
+    <title>Report Found Item | FindIt</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div style="max-width: 760px; margin: 0 auto;">
+        <!-- Header -->
+        <div class="mb-4 text-center">
+            <span class="badge badge-found" style="font-size: 0.85rem; padding: 0.35rem 0.85rem; margin-bottom: 0.5rem;">Good Samaritan</span>
+            <h1>Report a Found Item</h1>
+            <p class="text-muted">Register an item you discovered so its owner can submit proof and reclaim it.</p>
+        </div>
+
+        <!-- Real-time Duplicate Warning Container -->
+        <div id="duplicateWarningBox" style="display: none; margin-bottom: 1.5rem;"></div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/items/report/found}" th:object="${itemDto}" method="post" enctype="multipart/form-data" novalidate>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" id="type" name="type" value="FOUND" />
+
+                    <!-- Item Title -->
+                    <div class="form-group mb-3">
+                        <label for="title" class="form-label">Item Title <span class="required">*</span></label>
+                        <input type="text" id="title" th:field="*{title}"
+                               th:class="'form-control ' + (${#fields.hasErrors('title')} ? 'is-invalid' : '')"
+                               placeholder="e.g. Set of Toyota Car Keys with Red Lanyard, Black North Face Backpack...">
+                        <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="invalid-feedback">Title is required</div>
+                        <div class="form-text">Brief, clear name of the found property.</div>
+                    </div>
+
+                    <!-- Category & Color (2 Columns) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" class="mb-3">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="category" class="form-label">Category <span class="required">*</span></label>
+                            <select id="category" th:field="*{category}"
+                                    th:class="'form-control ' + (${#fields.hasErrors('category')} ? 'is-invalid' : '')">
+                                <option value="">-- Select Category --</option>
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}">Category</option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="invalid-feedback">Category is required</div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="color" class="form-label">Color</label>
+                            <input type="text" id="color" th:field="*{color}"
+                                   th:class="'form-control ' + (${#fields.hasErrors('color')} ? 'is-invalid' : '')"
+                                   placeholder="e.g. Black, Silver, Navy Blue">
+                            <div th:if="${#fields.hasErrors('color')}" th:errors="*{color}" class="invalid-feedback">Invalid color</div>
+                        </div>
+                    </div>
+
+                    <!-- Location & Date (2 Columns) -->
+                    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem;" class="mb-3">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="location" class="form-label">Where Found on Campus <span class="required">*</span></label>
+                            <input type="text" id="location" th:field="*{location}"
+                                   th:class="'form-control ' + (${#fields.hasErrors('location')} ? 'is-invalid' : '')"
+                                   placeholder="e.g. Student Union Cafeteria Table 4, Library 1st Floor Printer">
+                            <div th:if="${#fields.hasErrors('location')}" th:errors="*{location}" class="invalid-feedback">Location is required</div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="eventDate" class="form-label">Date Found <span class="required">*</span></label>
+                            <input type="date" id="eventDate" th:field="*{eventDate}"
+                                   th:class="'form-control ' + (${#fields.hasErrors('eventDate')} ? 'is-invalid' : '')">
+                            <div th:if="${#fields.hasErrors('eventDate')}" th:errors="*{eventDate}" class="invalid-feedback">Date is required</div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group mb-3">
+                        <label for="description" class="form-label">Public Description & Custody Status <span class="required">*</span></label>
+                        <textarea id="description" th:field="*{description}" rows="4"
+                                  th:class="'form-control ' + (${#fields.hasErrors('description')} ? 'is-invalid' : '')"
+                                  placeholder="Describe general condition and where the item is currently kept (e.g. 'Turned in to campus library front desk' or 'Held with finder - submit claim to verify')..."></textarea>
+                        <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="invalid-feedback">Description is required</div>
+                        <div class="form-text">Keep confidential private details withheld so the true owner can describe them when submitting a claim.</div>
+                    </div>
+
+                    <!-- Image Upload with Live Preview -->
+                    <div class="form-group mb-4">
+                        <label for="imageFile" class="form-label">Photo of Found Item (Optional)</label>
+                        <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/png, image/jpeg, image/webp, image/gif">
+                        <div class="form-text">Max file size: 5MB. (Optional, but greatly speeds up owner identification).</div>
+
+                        <!-- Image Preview Container -->
+                        <div id="imagePreviewContainer" style="display: none; align-items: center; gap: 1rem; margin-top: 0.75rem; padding: 0.75rem; background: var(--color-slate-50); border-radius: var(--radius-md); border: 1px solid var(--color-slate-200);">
+                            <img id="imagePreview" src="" alt="Selected Preview" style="width: 70px; height: 70px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--color-slate-300);">
+                            <div>
+                                <span style="font-size: 0.85rem; font-weight: 600; display: block;">Photo Ready to Upload</span>
+                                <button type="button" id="removeImageBtn" class="btn btn-sm btn-outline-danger" style="margin-top: 0.25rem;">Remove Photo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between align-items-center pt-3" style="border-top: 1px solid var(--color-slate-200);">
+                        <a th:href="@{/items}" class="btn btn-outline-navy">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Publish Found Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="script">
+    <script th:src="@{/js/items.js}"></script>
+</th:block>
+</body>
+</html>

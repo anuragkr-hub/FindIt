@@ -1,0 +1,35 @@
+# Target build files and JARs
+target/
+backend/target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Persistent local databases & uploaded media
+data/
+backend/data/
+uploads/
+backend/uploads/
+*.db
+*.mv.db
+*.trace.db
+
+# IDE and Editor configurations
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+bin/
+
+# Environment files with sensitive credentials
+.env
+*.env.local
+
+# Operating System temporary files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

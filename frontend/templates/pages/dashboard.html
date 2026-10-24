@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{})}">
+<head>
+    <title>User Dashboard | FindIt</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h1>User Dashboard</h1>
+            <p class="text-muted" style="margin-bottom: 0;">
+                Welcome back, <strong th:text="${currentUser.fullName}">Student</strong>! Manage your reports, claims, and matching alerts.
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/items/report/lost}" class="btn btn-outline-navy">+ Report Lost</a>
+            <a th:href="@{/items/report/found}" class="btn btn-primary">+ Report Found</a>
+        </div>
+    </div>
+
+    <!-- Personal Metrics Grid -->
+    <div class="stats-grid mb-4">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-icon-blue">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            </div>
+            <div>
+                <div class="stat-value" th:text="${myOpenItemsCount}">0</div>
+                <div class="stat-label">Active Reports</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-icon-amber">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <div>
+                <div class="stat-value" th:text="${myPendingClaimsCount}">0</div>
+                <div class="stat-label">My Pending Claims</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-icon-green">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            </div>
+            <div>
+                <div class="stat-value" th:text="${incomingPendingCount}">0</div>
+                <div class="stat-label">Claims to Review</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-icon-navy">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+                <div class="stat-value" th:text="${myResolvedItemsCount}">0</div>
+                <div class="stat-label">Recovered & Returned</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Tabs -->
+    <ul class="tabs-nav" role="tablist">
+        <li>
+            <button class="tab-link active" data-tab-target="#my-reports-pane">
+                My Reports (<span th:text="${myItems.size()}">0</span>)
+            </button>
+        </li>
+        <li>
+            <button class="tab-link" data-tab-target="#incoming-claims-pane">
+                Incoming Claims to Review (<span th:text="${incomingPendingCount}">0</span>)
+            </button>
+        </li>
+        <li>
+            <button class="tab-link" data-tab-target="#my-claims-pane">
+                My Submitted Claims (<span th:text="${mySubmittedClaims.size()}">0</span>)
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab 1: My Reports -->
+    <div id="my-reports-pane" class="tab-pane">
+        <div class="card">
+            <div class="card-body">
+                <div th:if="${myItems != null && !myItems.isEmpty()}" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Location</th>
+                                <th>Event Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${myItems}">
+                                <td>
+                                    <strong th:text="${item.title}">Title</strong>
+                                </td>
+                                <td>
+                                    <span th:class="'badge ' + (${item.lost} ? 'badge-lost' : 'badge-found')"
+                                          th:text="${item.type.displayName}">Type</span>
+                                </td>
+                                <td><span class="badge badge-category" th:text="${item.category.displayName}">Category</span></td>
+                                <td th:text="${item.location}">Location</td>
+                                <td th:text="${#temporals.format(item.eventDate, 'MMM dd, yyyy')}">Date</td>
+                                <td>
+                                    <span th:class="'badge ' + (${item.status.name() == 'OPEN'} ? 'badge-open' : (${item.status.name() == 'CLAIM_PENDING'} ? 'badge-pending' : 'badge-resolved'))"
+                                          th:text="${item.status.displayName}">Status</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{'/items/' + ${item.id}}" class="btn btn-sm btn-outline-navy">View</a>
+                                        <a th:if="${item.status.name() != 'RESOLVED'}" th:href="@{'/items/edit/' + ${item.id}}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <a th:href="@{'/matches/' + ${item.id}}" class="btn btn-sm btn-primary">Matches</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:unless="${myItems != null && !myItems.isEmpty()}" class="empty-state">
+                    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <h3 class="empty-state-title">You haven't reported any items yet</h3>
+                    <p class="empty-state-text">If you misplaced something or found property on campus, publish a report to get started.</p>
+                    <a th:href="@{/items/report/lost}" class="btn btn-primary">Report an Item</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Incoming Claims to Review -->
+    <div id="incoming-claims-pane" class="tab-pane" style="display: none;">
+        <div class="card">
+            <div class="card-body">
+                <div th:if="${myReceivedClaims != null && !myReceivedClaims.isEmpty()}" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Claimed</th>
+                                <th>Claimant</th>
+                                <th>Phone</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${myReceivedClaims}">
+                                <td>
+                                    <a th:href="@{'/items/' + ${c.item.id}}" th:text="${c.item.title}" style="font-weight: 700;">Item Title</a>
+                                </td>
+                                <td th:text="${c.claimant.fullName}">Claimant</td>
+                                <td th:text="${c.contactPhone != null ? c.contactPhone : '-'}">Phone</td>
+                                <td th:text="${#temporals.format(c.createdAt, 'MMM dd, yyyy')}">Date</td>
+                                <td>
+                                    <span th:class="'badge ' + (${c.pending} ? 'badge-pending' : (${c.approved} ? 'badge-resolved' : 'badge-withdrawn'))"
+                                          th:text="${c.status.displayName}">Pending</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{'/claims/review/' + ${c.id}}" class="btn btn-sm btn-primary">
+                                        Review Evidence &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:unless="${myReceivedClaims != null && !myReceivedClaims.isEmpty()}" class="empty-state">
+                    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 class="empty-state-title">No incoming claims to review</h3>
+                    <p class="empty-state-text">When another student or staff member submits ownership proof for an item you reported, it will appear here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: My Submitted Claims -->
+    <div id="my-claims-pane" class="tab-pane" style="display: none;">
+        <div class="card">
+            <div class="card-body">
+                <div th:if="${mySubmittedClaims != null && !mySubmittedClaims.isEmpty()}" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Claimed</th>
+                                <th>Reported By</th>
+                                <th>Submitted On</th>
+                                <th>Status</th>
+                                <th>Reviewer Feedback</th>
+                                <th>Item Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${mySubmittedClaims}">
+                                <td>
+                                    <strong th:text="${c.item.title}">Item Title</strong>
+                                    <div style="font-size: 0.8rem; color: var(--color-slate-500);" th:text="${c.item.location}">Location</div>
+                                </td>
+                                <td th:text="${c.item.user.fullName}">Reporter</td>
+                                <td th:text="${#temporals.format(c.createdAt, 'MMM dd, yyyy')}">Date</td>
+                                <td>
+                                    <span th:class="'badge ' + (${c.pending} ? 'badge-pending' : (${c.approved} ? 'badge-resolved' : 'badge-withdrawn'))"
+                                          th:text="${c.status.displayName}">Pending</span>
+                                </td>
+                                <td>
+                                    <span th:text="${c.reviewerNotes != null && !c.reviewerNotes.empty ? c.reviewerNotes : 'Under review by reporter'}">Notes</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{'/items/' + ${c.item.id}}" class="btn btn-sm btn-outline-navy">View Item</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:unless="${mySubmittedClaims != null && !mySubmittedClaims.isEmpty()}" class="empty-state">
+                    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <h3 class="empty-state-title">You haven't submitted any claims yet</h3>
+                    <p class="empty-state-text">If you locate an item in the database that matches something you lost, submit a claim to prove ownership.</p>
+                    <a th:href="@{/items}" class="btn btn-outline-navy">Browse Found Items</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
