@@ -89,9 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!targetPane) return;
 
             // Deactivate all sibling tabs in container
-            const tabsNav = this.closest('.tabs-nav');
+            const tabsNav = this.closest('.tabs-nav, .modern-segmented-tabs');
             if (tabsNav) {
-                tabsNav.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+                tabsNav.querySelectorAll('.tab-link, .segmented-tab-btn').forEach(btn => btn.classList.remove('active'));
             }
             this.classList.add('active');
 

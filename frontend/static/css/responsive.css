@@ -33,6 +33,20 @@
     .detail-layout-grid {
         grid-template-columns: 1fr !important;
     }
+
+    .dashboard-main-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dashboard-hero-content {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1.5rem !important;
+    }
+
+    .dashboard-quick-actions {
+        width: 100%;
+    }
 }
 
 /* Mobile Devices (<= 640px) */
