@@ -54,12 +54,12 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/css/**", "/js/**", "/img/**", "/uploads/**", "/favicon.ico", "/error"
                 ).permitAll()
-                // Public landing & browsing
+                // Public landing, browsing & OTP verification
                 .requestMatchers(
-                    "/", "/items", "/items/{id:[0-9]+}", "/matches/{id:[0-9]+}", "/api/items/check-duplicate"
+                    "/", "/items", "/items/{id:[0-9]+}", "/matches/{id:[0-9]+}", "/api/items/check-duplicate", "/api/otp/**"
                 ).permitAll()
                 // Auth endpoints
-                .requestMatchers("/login", "/register").permitAll()
+                .requestMatchers("/login", "/register", "/login/otp").permitAll()
                 // Admin dashboard and endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // All other operations require authentication

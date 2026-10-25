@@ -1,0 +1,768 @@
+/* ==========================================================================
+   FindIt - Command Center Premium Aesthetic & OTP Identity Gateway
+   Version: 5.0 (High-Impact Dark Glassmorphism, Neon HUD, Radar Sweeper)
+   ========================================================================== */
+
+/* Dark Command Center Canvas */
+body.command-center-body,
+.command-center-canvas {
+    background: radial-gradient(1200px 900px at 50% -80px, #1e293b 0%, #0b1120 50%, #020617 100%) !important;
+    color: #f1f5f9 !important;
+    min-height: 100vh;
+}
+
+/* 1. Hero Command Bridge Banner */
+.command-hero-bridge {
+    position: relative;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 20px;
+    padding: 2.25rem 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                0 0 35px rgba(56, 189, 248, 0.12);
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+}
+
+.command-hero-bridge::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    animation: ambient-drift 12s ease-in-out infinite alternate;
+}
+
+@keyframes ambient-drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-40px, 30px) scale(1.15); }
+}
+
+.command-hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.command-avatar-glow {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0284c7, #38bdf8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 1.85rem;
+    font-weight: 800;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+}
+
+.command-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.775rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.65rem;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+}
+
+.command-status-pill.pill-amber {
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fbbf24;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+}
+
+.command-pulse-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #10b981;
+    box-shadow: 0 0 10px #10b981;
+    animation: live-pulse 2s infinite;
+}
+
+.command-status-pill.pill-amber .command-pulse-dot {
+    background-color: #f59e0b;
+    box-shadow: 0 0 10px #f59e0b;
+}
+
+@keyframes live-pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.command-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.025em;
+    margin: 0 0 0.35rem;
+    line-height: 1.2;
+}
+
+.command-subtitle {
+    font-size: 0.925rem;
+    color: #94a3b8;
+    margin: 0;
+}
+
+/* Hero Launchpad Buttons */
+.command-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.btn-command-lost {
+    background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+    color: #ffffff !important;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1.35rem;
+    box-shadow: 0 8px 20px -4px rgba(220, 38, 38, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s ease;
+}
+
+.btn-command-lost:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -4px rgba(220, 38, 38, 0.7);
+}
+
+.btn-command-found {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #ffffff !important;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1.35rem;
+    box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s ease;
+}
+
+.btn-command-found:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -4px rgba(16, 185, 129, 0.7);
+}
+
+.btn-command-radar {
+    background: rgba(30, 41, 59, 0.8);
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    font-weight: 700;
+    border-radius: 12px;
+    padding: 0.75rem 1.35rem;
+    box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
+}
+
+.btn-command-radar:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38bdf8;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    transform: translateY(-2px);
+}
+
+/* 2. HUD Metric Cards Grid */
+.hud-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.25rem;
+}
+
+.hud-tile {
+    position: relative;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(16px);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    overflow: hidden;
+}
+
+.hud-tile:hover {
+    transform: translateY(-4px);
+    border-color: rgba(56, 189, 248, 0.4);
+    box-shadow: 0 18px 35px -8px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 189, 248, 0.15);
+}
+
+.hud-tile-blue {
+    border-top: 3px solid #38bdf8;
+}
+
+.hud-tile-amber {
+    border-top: 3px solid #f59e0b;
+}
+
+.hud-tile-emerald {
+    border-top: 3px solid #10b981;
+}
+
+.hud-tile-indigo {
+    border-top: 3px solid #818cf8;
+}
+
+.hud-tile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.hud-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.hud-icon-blue {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+}
+
+.hud-icon-amber {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+}
+
+.hud-icon-emerald {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+}
+
+.hud-icon-indigo {
+    background: rgba(129, 140, 248, 0.15);
+    color: #818cf8;
+    box-shadow: 0 0 15px rgba(129, 140, 248, 0.25);
+}
+
+.hud-tag {
+    font-size: 0.725rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hud-tag.tag-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.hud-tag.tag-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.hud-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #ffffff;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.03em;
+}
+
+.hud-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+/* 3. Segmented Tab Switcher (HUD Style) */
+.hud-tabs-wrapper {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 0.35rem;
+    display: inline-flex;
+    gap: 0.35rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(12px);
+    width: 100%;
+}
+
+.hud-tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hud-tab-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.hud-tab-btn.active {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.hud-tab-badge {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.15rem 0.55rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.hud-tab-btn.active .hud-tab-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+.hud-tab-badge.badge-alert {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    animation: live-pulse 1.8s infinite;
+}
+
+/* 4. Glass Item Row Cards */
+.hud-item-card {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(12px);
+}
+
+.hud-item-card:hover {
+    border-color: rgba(56, 189, 248, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.1);
+}
+
+.hud-item-card.card-lost {
+    border-left: 4px solid #ef4444;
+}
+
+.hud-item-card.card-found {
+    border-left: 4px solid #10b981;
+}
+
+.hud-item-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #f8fafc;
+    text-decoration: none;
+    margin-bottom: 0.35rem;
+    display: inline-block;
+    transition: color 0.15s ease;
+}
+
+.hud-item-title:hover {
+    color: #38bdf8;
+}
+
+.hud-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.825rem;
+    color: #94a3b8;
+}
+
+/* 5. Real Animated Radar Sweep Widget */
+.radar-hub-widget {
+    position: relative;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(3, 7, 18, 0.95) 100%);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 18px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 12px 35px -8px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(16px);
+    overflow: hidden;
+}
+
+.radar-scope-circle {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0.75rem auto 1.25rem;
+    border-radius: 50%;
+    border: 2px solid rgba(56, 189, 248, 0.4);
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(2, 6, 23, 0.8) 70%);
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.2), inset 0 0 20px rgba(56, 189, 248, 0.15);
+    overflow: hidden;
+}
+
+.radar-scope-circle::before {
+    content: '';
+    position: absolute;
+    inset: 22px;
+    border-radius: 50%;
+    border: 1px dashed rgba(56, 189, 248, 0.3);
+}
+
+.radar-scope-circle::after {
+    content: '';
+    position: absolute;
+    inset: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.radar-crosshair-h {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(56, 189, 248, 0.25);
+}
+
+.radar-crosshair-v {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(56, 189, 248, 0.25);
+}
+
+.radar-sweep-beam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(56, 189, 248, 0.4) 0deg, transparent 65deg, transparent 360deg);
+    animation: radar-sweep 3s linear infinite;
+}
+
+@keyframes radar-sweep {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.radar-blip {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #38bdf8;
+    box-shadow: 0 0 8px #38bdf8;
+    animation: blip-pulse 3s infinite;
+}
+
+.radar-blip.b1 { top: 35%; left: 65%; animation-delay: 0.5s; }
+.radar-blip.b2 { top: 70%; left: 30%; animation-delay: 1.8s; }
+
+@keyframes blip-pulse {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* 5-Factor Deterministic Progress Bars */
+.radar-factor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 1.25rem;
+}
+
+.radar-factor-row {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+}
+
+.radar-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-top: 0.25rem;
+}
+
+.radar-progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #2563eb, #38bdf8);
+}
+
+/* 6. OTP Identity Security Styles */
+.otp-auth-card {
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                0 0 35px rgba(56, 189, 248, 0.12);
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+    color: #f1f5f9;
+}
+
+.otp-tabs-container {
+    display: flex;
+    background: rgba(2, 6, 23, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.otp-tab {
+    flex: 1;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #94a3b8;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.otp-tab.active {
+    color: #38bdf8;
+    border-bottom-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.08);
+}
+
+.otp-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.otp-code-input {
+    font-family: var(--font-mono, monospace);
+    font-size: 1.5rem !important;
+    letter-spacing: 0.35em;
+    text-align: center;
+    font-weight: 800 !important;
+    background: rgba(2, 6, 23, 0.7) !important;
+    color: #38bdf8 !important;
+    border: 2px solid rgba(56, 189, 248, 0.4) !important;
+    border-radius: 12px !important;
+    padding: 0.65rem 1rem !important;
+}
+
+.otp-code-input:focus {
+    outline: none;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.5) !important;
+}
+
+/* Floating OTP Demo Assistant Toast */
+.otp-demo-toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 9999;
+    max-width: 380px;
+    background: #0f172a;
+    border: 2px solid #38bdf8;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.4);
+    padding: 1.25rem;
+    animation: toast-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toast-slide-up {
+    0% { transform: translateY(40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.otp-toast-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ffffff;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.otp-toast-body {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    margin-bottom: 0.85rem;
+}
+
+.otp-code-highlight {
+    font-family: monospace;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.15);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.otp-toast-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.otp-status-message {
+    padding: 0.65rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: none;
+}
+
+.otp-status-info {
+    background: rgba(2, 132, 199, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+.otp-status-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.otp-status-error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.otp-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Verified check shield */
+.verified-shield-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10b981;
+    color: #34d399;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.775rem;
+    font-weight: 700;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .command-hero-bridge {
+        padding: 1.75rem;
+    }
+    .command-hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+    }
+    .command-btn-group {
+        width: 100%;
+    }
+    .command-btn-group a {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+    }
+    .command-center-canvas > div[style*="grid-template-columns: 2fr 1.1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .hud-metrics-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .hud-number {
+        font-size: 2rem;
+    }
+    .command-title {
+        font-size: 1.5rem;
+    }
+    .hud-tabs-wrapper {
+        flex-direction: column;
+    }
+    .hud-item-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .hud-item-card > div:last-child {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+}

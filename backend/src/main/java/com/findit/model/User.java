@@ -36,6 +36,21 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = true;
+
+    @Column(name = "phone_verified", nullable = false)
+    private boolean phoneVerified = false;
+
+    @Column(name = "otp_code", length = 10)
+    private String otpCode;
+
+    @Column(name = "otp_expiry")
+    private LocalDateTime otpExpiry;
+
+    @Column(name = "pending_verification_target", length = 120)
+    private String pendingVerificationTarget;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -128,6 +143,46 @@ public class User {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public boolean isPhoneVerified() {
+        return phoneVerified;
+    }
+
+    public void setPhoneVerified(boolean phoneVerified) {
+        this.phoneVerified = phoneVerified;
+    }
+
+    public String getOtpCode() {
+        return otpCode;
+    }
+
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
+    }
+
+    public LocalDateTime getOtpExpiry() {
+        return otpExpiry;
+    }
+
+    public void setOtpExpiry(LocalDateTime otpExpiry) {
+        this.otpExpiry = otpExpiry;
+    }
+
+    public String getPendingVerificationTarget() {
+        return pendingVerificationTarget;
+    }
+
+    public void setPendingVerificationTarget(String pendingVerificationTarget) {
+        this.pendingVerificationTarget = pendingVerificationTarget;
     }
 
     public boolean isAdmin() {

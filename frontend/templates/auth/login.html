@@ -1,65 +1,161 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{})}">
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{::scripts})}">
 <head>
-    <title>Log In | FindIt Campus Lost & Found</title>
+    <title>Sign In | FindIt Campus Safety</title>
 </head>
 <body>
 <div th:fragment="content">
-    <div style="max-width: 460px; margin: 2rem auto;">
-        <!-- Card -->
-        <div class="card" style="box-shadow: var(--shadow-xl); border-radius: var(--radius-xl);">
-            <div class="card-body" style="padding: 2.5rem 2rem;">
+    <div style="max-width: 480px; margin: 1.5rem auto;">
+        <!-- Card with Dark Glassmorphic Aesthetic -->
+        <div class="card otp-auth-card">
+            <!-- Dual Auth Tabs: Password vs Instant OTP -->
+            <div class="otp-tabs-container" role="tablist">
+                <button type="button" class="otp-tab active" id="tab-password-login">
+                    Password Sign In
+                </button>
+                <button type="button" class="otp-tab" id="tab-otp-login">
+                    Instant OTP Sign In
+                </button>
+            </div>
+
+            <div class="card-body" style="padding: 2.25rem 2rem;">
                 <!-- Header -->
                 <div class="text-center mb-4">
-                    <img th:src="@{/img/logo.png}" alt="FindIt Logo" style="width: 72px; height: 72px; object-fit: contain; margin: 0 auto 1rem; display: block; border-radius: var(--radius-lg); box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: white; padding: 4px;">
-                    <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Welcome to FindIt</h1>
-                    <p class="text-muted" style="font-size: 0.9rem;">Sign in with your campus credentials</p>
+                    <img th:src="@{/img/logo.png}" alt="FindIt Logo" style="width: 72px; height: 72px; object-fit: contain; margin: 0 auto 1rem; display: block; border-radius: 16px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); background: #0f172a; padding: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">
+                    <h1 style="font-size: 1.65rem; margin-bottom: 0.35rem; color: #ffffff; font-weight: 800;">Welcome to FindIt</h1>
+                    <p style="font-size: 0.875rem; color: #94a3b8; margin: 0;">Sign in securely with credentials or direct OTP verification</p>
                 </div>
 
-                <!-- Flash Statuses -->
-                <div th:if="${param.error}" class="alert alert-danger" style="font-size: 0.875rem;">
+                <!-- Global Alerts / Error Flash -->
+                <div th:if="${param.error}" class="alert alert-danger" style="font-size: 0.875rem; background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
                     Invalid campus email or password. Please verify and try again.
                 </div>
 
-                <div th:if="${param.logout}" class="alert alert-info" style="font-size: 0.875rem;">
-                    You have been securely logged out.
+                <div th:if="${param.logout}" class="alert alert-info" style="font-size: 0.875rem; background: rgba(2, 132, 199, 0.15); border-color: rgba(2, 132, 199, 0.4); color: #7dd3fc;">
+                    You have been securely signed out.
                 </div>
 
-                <!-- Login Form -->
-                <form th:action="@{/login}" method="post" novalidate>
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <!-- SECTION 1: Standard Password Login -->
+                <div id="password-login-section">
+                    <form th:action="@{/login}" method="post" novalidate>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-                    <div class="form-group mb-3">
-                        <label for="username" class="form-label">Campus Email</label>
-                        <input type="email" id="username" name="username" class="form-control" placeholder="name@campus.edu" required autofocus>
-                    </div>
+                        <div class="form-group mb-3">
+                            <label for="username" class="form-label" style="color: #cbd5e1; font-weight: 600;">Campus Email</label>
+                            <input type="email" id="username" name="username" class="form-control" placeholder="name@campus.edu" required autofocus>
+                        </div>
 
-                    <div class="form-group mb-4">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" id="password" name="password" class="form-control" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required>
-                    </div>
+                        <div class="form-group mb-4">
+                            <label for="password" class="form-label" style="color: #cbd5e1; font-weight: 600;">Password</label>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required>
+                        </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 1.25rem;">
-                        Sign In
-                    </button>
-                </form>
+                        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 1.25rem; font-weight: 700;">
+                            Sign In with Password
+                        </button>
+                    </form>
+                </div>
+
+                <!-- SECTION 2: Instant OTP Login (Email or Mobile) -->
+                <div id="otp-login-section" style="display: none;">
+                    <form th:action="@{/login/otp}" method="post" id="otpLoginForm" novalidate>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                        <!-- Target: Email or Phone -->
+                        <div class="form-group mb-3">
+                            <label for="loginOtpTarget" class="form-label" style="color: #cbd5e1; font-weight: 600;">
+                                Registered Campus Email or Mobile Number
+                            </label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="loginOtpTarget" name="target" class="form-control"
+                                       placeholder="e.g. alex@campus.edu or 555-0101" required style="flex: 1;">
+                                <button type="button" class="btn btn-outline-secondary" id="sendLoginOtpBtn" style="white-space: nowrap; font-size: 0.85rem;">
+                                    Send Code
+                                </button>
+                            </div>
+                            <div id="loginOtpStatus" class="otp-status-message"></div>
+                        </div>
+
+                        <!-- 6-Digit OTP Code Input -->
+                        <div id="loginOtpCodeGroup" style="display: none;" class="mb-4">
+                            <label for="loginOtpCode" class="form-label" style="color: #cbd5e1; font-weight: 600;">
+                                6-Digit One-Time Password
+                            </label>
+                            <input type="text" id="loginOtpCode" name="otpCode" maxlength="6"
+                                   class="form-control otp-code-input" placeholder="000000" required>
+                            <div style="font-size: 0.775rem; color: #64748b; margin-top: 0.35rem; line-height: 1.4;">
+                                Code expires in 5 minutes. Check your inbox, phone, or console log.
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitOtpLoginBtn" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 1.25rem; font-weight: 700;">
+                            Verify &amp; Sign In with OTP
+                        </button>
+                    </form>
+                </div>
 
                 <!-- Demo Credentials Box -->
-                <div style="background-color: var(--color-slate-50); border: 1px dashed var(--color-slate-300); border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.8rem; color: var(--color-slate-600); margin-bottom: 1.25rem;">
-                    <strong style="color: var(--color-navy-900); display: block; margin-bottom: 0.25rem;">Sample Demo Accounts:</strong>
-                    <div>&bull; Admin: <code>admin@findit.campus.edu</code> / <code>AdminPass123!</code></div>
-                    <div>&bull; Student: <code>alex@campus.edu</code> / <code>UserPass123!</code></div>
+                <div style="background-color: rgba(2, 6, 23, 0.6); border: 1px dashed rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 0.85rem 1rem; font-size: 0.8rem; color: #94a3b8; margin-bottom: 1.25rem;">
+                    <strong style="color: #38bdf8; display: block; margin-bottom: 0.25rem;">Quick Demo Credentials:</strong>
+                    <div>&bull; Admin: <code style="color: #7dd3fc;">admin@findit.campus.edu</code> / <code style="color: #cbd5e1;">AdminPass123!</code></div>
+                    <div>&bull; Student: <code style="color: #7dd3fc;">alex@campus.edu</code> / <code style="color: #cbd5e1;">UserPass123!</code></div>
+                    <div style="margin-top: 0.35rem; color: #64748b; font-size: 0.75rem;">
+                        (Or switch to <strong>Instant OTP Sign In</strong> tab and type <code>alex@campus.edu</code> &rarr; click Send Code)
+                    </div>
                 </div>
 
                 <!-- Registration link -->
-                <div class="text-center" style="font-size: 0.9rem; color: var(--color-slate-600);">
+                <div class="text-center" style="font-size: 0.9rem; color: #94a3b8;">
                     Don't have an account yet?
-                    <a th:href="@{/register}" style="font-weight: 600;">Create one here</a>
+                    <a th:href="@{/register}" style="font-weight: 700; color: #38bdf8;">Create a verified account &rarr;</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<th:block th:fragment="scripts">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sendBtn = document.getElementById('sendLoginOtpBtn');
+    const targetInput = document.getElementById('loginOtpTarget');
+    const codeGroup = document.getElementById('loginOtpCodeGroup');
+    const codeInput = document.getElementById('loginOtpCode');
+    const form = document.getElementById('otpLoginForm');
+
+    if (sendBtn) {
+        sendBtn.addEventListener('click', function() {
+            const target = targetInput.value.trim();
+            if (!target) {
+                FindItOTP.showStatus('loginOtpStatus', 'Please enter your registered email or phone number.', 'error');
+                targetInput.focus();
+                return;
+            }
+
+            FindItOTP.sendOtp({
+                target: target,
+                purpose: 'LOGIN',
+                buttonEl: sendBtn,
+                statusEl: 'loginOtpStatus',
+                codeContainerEl: codeGroup,
+                autoFillInputEl: codeInput
+            });
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const target = targetInput.value.trim();
+            const code = codeInput.value.trim();
+            if (!target || !code) {
+                e.preventDefault();
+                FindItOTP.showStatus('loginOtpStatus', 'Please enter both your registered email/phone and 6-digit OTP.', 'error');
+            }
+        });
+    }
+});
+</script>
+</th:block>
 </body>
 </html>

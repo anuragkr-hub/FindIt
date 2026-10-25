@@ -2,49 +2,51 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{})}">
 <head>
-    <title>User Command Center | FindIt</title>
+    <title>Campus Command Center | FindIt</title>
 </head>
 <body>
-<div th:fragment="content">
+<div th:fragment="content" class="command-center-canvas" style="padding-top: 0.5rem;">
 
-    <!-- 1. Modern Hero Command Banner -->
-    <div class="dashboard-hero-banner">
-        <div class="dashboard-hero-content">
-            <div class="dashboard-user-greeting">
-                <div class="dashboard-avatar-pill" th:text="${currentUser != null ? #strings.substring(currentUser.fullName, 0, 1) : 'U'}">
+    <!-- 1. Futuristic Hero Command Bridge -->
+    <div class="command-hero-bridge">
+        <div class="command-hero-content">
+            <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                <div class="command-avatar-glow" th:text="${currentUser != null ? #strings.substring(currentUser.fullName, 0, 1) : 'U'}">
                     U
                 </div>
                 <div>
                     <div>
-                        <span th:if="${incomingPendingCount > 0}" class="dashboard-status-chip chip-amber">
-                            <span class="pulse-dot"></span>
-                            Action Required: <strong th:text="${incomingPendingCount}">1</strong> claim awaiting your review
+                        <span th:if="${incomingPendingCount > 0}" class="command-status-pill pill-amber">
+                            <span class="command-pulse-dot"></span>
+                            Priority: <strong th:text="${incomingPendingCount}" style="margin: 0 3px;">1</strong> Claim Awaiting Your Ownership Review
                         </span>
-                        <span th:unless="${incomingPendingCount > 0}" class="dashboard-status-chip chip-emerald">
-                            <span class="status-dot-green"></span>
-                            Campus Active: All reports synchronized
+                        <span th:unless="${incomingPendingCount > 0}" class="command-status-pill">
+                            <span class="command-pulse-dot"></span>
+                            Campus Grid Active: 100% Reports Synchronized
                         </span>
                     </div>
-                    <h1 class="dashboard-hero-title">
-                        Welcome back, <span th:text="${currentUser.fullName}">Student</span>!
+                    <h1 class="command-title">
+                        Welcome, <span th:text="${currentUser.fullName}">Student</span>!
                     </h1>
-                    <p class="dashboard-hero-subtitle">
-                        Campus Safety Recovery Hub &bull; <span th:text="${currentUser.email}">user@campus.edu</span>
+                    <p class="command-subtitle">
+                        Campus Lost &amp; Found Command Hub &bull;
+                        <span th:text="${currentUser.email}">user@campus.edu</span>
+                        <span th:if="${currentUser.phone != null && !currentUser.phone.empty}"> &bull; <span th:text="${currentUser.phone}">Phone</span></span>
                     </p>
                 </div>
             </div>
 
-            <!-- Quick Action Launchpad -->
-            <div class="dashboard-quick-actions">
-                <a th:href="@{/items/report/lost}" class="btn btn-hero-lost">
+            <!-- Hero Launchpad Actions -->
+            <div class="command-btn-group">
+                <a th:href="@{/items/report/lost}" class="btn-command-lost">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     Report Lost Item
                 </a>
-                <a th:href="@{/items/report/found}" class="btn btn-hero-found">
+                <a th:href="@{/items/report/found}" class="btn-command-found">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Report Found Item
                 </a>
-                <a th:href="@{/matches}" class="btn btn-hero-glass">
+                <a th:href="@{/matches}" class="btn-command-radar">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><path d="M21 21l-4.35-4.35" stroke-width="2"></path></svg>
                     Match Radar
                 </a>
@@ -52,130 +54,122 @@
         </div>
     </div>
 
-    <!-- 2. Distinctive Elevated Metric Tiles -->
-    <div class="modern-stats-grid">
-        <!-- Active Reports -->
-        <div class="modern-stat-tile tile-blue">
-            <div class="stat-tile-top">
-                <div class="stat-tile-icon-box box-blue">
+    <!-- 2. High-Impact HUD Metric Tiles Grid -->
+    <div class="hud-metrics-grid">
+        <!-- My Active Reports -->
+        <div class="hud-tile hud-tile-blue">
+            <div class="hud-tile-header">
+                <div class="hud-icon-box hud-icon-blue">
                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 </div>
-                <span class="stat-tile-trend trend-neutral">Active</span>
+                <span class="hud-tag">Active Reports</span>
             </div>
-            <div>
-                <div class="stat-tile-number" th:text="${myOpenItemsCount}">0</div>
-                <div class="stat-tile-label">My Active Reports</div>
-            </div>
+            <div class="hud-number" th:text="${myOpenItemsCount}">0</div>
+            <div class="hud-label">Your Active Campus Reports</div>
         </div>
 
-        <!-- My Pending Claims -->
-        <div class="modern-stat-tile tile-amber">
-            <div class="stat-tile-top">
-                <div class="stat-tile-icon-box box-amber">
+        <!-- Pending Claims -->
+        <div class="hud-tile hud-tile-amber">
+            <div class="hud-tile-header">
+                <div class="hud-icon-box hud-icon-amber">
                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
-                <span th:class="'stat-tile-trend ' + (${myPendingClaimsCount > 0} ? 'trend-warning' : 'trend-neutral')"
+                <span th:class="'hud-tag ' + (${myPendingClaimsCount > 0} ? 'tag-warning' : '')"
                       th:text="${myPendingClaimsCount > 0 ? 'Under Review' : 'Synced'}">Synced</span>
             </div>
-            <div>
-                <div class="stat-tile-number" th:text="${myPendingClaimsCount}">0</div>
-                <div class="stat-tile-label">My Pending Claims</div>
-            </div>
+            <div class="hud-number" th:text="${myPendingClaimsCount}">0</div>
+            <div class="hud-label">My Outgoing Claims</div>
         </div>
 
-        <!-- Claims to Review -->
-        <div class="modern-stat-tile tile-emerald">
-            <div class="stat-tile-top">
-                <div class="stat-tile-icon-box box-emerald">
+        <!-- Incoming Claims to Review -->
+        <div class="hud-tile hud-tile-emerald">
+            <div class="hud-tile-header">
+                <div class="hud-icon-box hud-icon-emerald">
                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
-                <span th:class="'stat-tile-trend ' + (${incomingPendingCount > 0} ? 'trend-warning' : 'trend-success')"
-                      th:text="${incomingPendingCount > 0 ? 'Action Needed' : 'All Clear'}">All Clear</span>
+                <span th:class="'hud-tag ' + (${incomingPendingCount > 0} ? 'tag-warning' : 'tag-success')"
+                      th:text="${incomingPendingCount > 0 ? 'Action Required' : 'All Clear'}">All Clear</span>
             </div>
-            <div>
-                <div class="stat-tile-number" th:text="${incomingPendingCount}">0</div>
-                <div class="stat-tile-label">Incoming Claims to Verify</div>
-            </div>
+            <div class="hud-number" th:text="${incomingPendingCount}">0</div>
+            <div class="hud-label">Incoming Claims to Verify</div>
         </div>
 
         <!-- Recovered & Returned -->
-        <div class="modern-stat-tile tile-indigo">
-            <div class="stat-tile-top">
-                <div class="stat-tile-icon-box box-indigo">
+        <div class="hud-tile hud-tile-indigo">
+            <div class="hud-tile-header">
+                <div class="hud-icon-box hud-icon-indigo">
                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <span class="stat-tile-trend trend-success">Reunited</span>
+                <span class="hud-tag tag-success">Reunited</span>
             </div>
-            <div>
-                <div class="stat-tile-number" th:text="${myResolvedItemsCount}">0</div>
-                <div class="stat-tile-label">Recovered & Returned</div>
-            </div>
+            <div class="hud-number" th:text="${myResolvedItemsCount}">0</div>
+            <div class="hud-label">Items Safely Recovered</div>
         </div>
     </div>
 
-    <!-- 3. Asymmetric Two-Column Command Grid -->
-    <div class="dashboard-main-grid">
+    <!-- 3. Asymmetric Two-Column HUD Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1.1fr; gap: 2rem; align-items: start;">
 
-        <!-- Left Primary Column (Reports & Claims Activity) -->
+        <!-- Left Column: Reports & Claims Management -->
         <div>
-            <!-- Modern Capsule Segmented Tabs -->
-            <div class="modern-segmented-tabs" role="tablist">
-                <button class="segmented-tab-btn active" data-tab-target="#my-reports-pane">
+            <!-- HUD Segmented Tab Buttons -->
+            <div class="hud-tabs-wrapper" role="tablist">
+                <button type="button" class="hud-tab-btn active" data-tab-target="#my-reports-pane">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     <span>My Reports</span>
-                    <span class="tab-count-badge" th:text="${myItems.size()}">0</span>
+                    <span class="hud-tab-badge" th:text="${myItems.size()}">0</span>
                 </button>
 
-                <button class="segmented-tab-btn" data-tab-target="#incoming-claims-pane">
+                <button type="button" class="hud-tab-btn" data-tab-target="#incoming-claims-pane">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     <span>Incoming Claims</span>
-                    <span th:class="'tab-count-badge ' + (${incomingPendingCount > 0} ? 'tab-count-alert' : '')"
+                    <span th:class="'hud-tab-badge ' + (${incomingPendingCount > 0} ? 'badge-alert' : '')"
                           th:text="${incomingPendingCount}">0</span>
                 </button>
 
-                <button class="segmented-tab-btn" data-tab-target="#my-claims-pane">
+                <button type="button" class="hud-tab-btn" data-tab-target="#my-claims-pane">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     <span>My Claims</span>
-                    <span class="tab-count-badge" th:text="${mySubmittedClaims.size()}">0</span>
+                    <span class="hud-tab-badge" th:text="${mySubmittedClaims.size()}">0</span>
                 </button>
             </div>
 
-            <!-- Tab 1: My Reports -->
+            <!-- Tab 1: My Reports Pane -->
             <div id="my-reports-pane" class="tab-pane">
                 <div th:if="${myItems != null && !myItems.isEmpty()}">
-                    <div th:each="item : ${myItems}" class="item-row-card">
-                        <div class="item-row-left">
-                            <div th:class="'item-type-avatar ' + (${item.lost} ? 'type-lost-avatar' : 'type-found-avatar')">
-                                <span th:if="${item.lost}">LOST</span>
-                                <span th:unless="${item.lost}">FND</span>
+                    <div th:each="item : ${myItems}" th:class="'hud-item-card ' + (${item.lost} ? 'card-lost' : 'card-found')">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+                                <span th:if="${item.lost}" class="badge badge-lost">LOST</span>
+                                <span th:unless="${item.lost}" class="badge badge-found">FOUND</span>
+                                <span class="badge badge-category" th:text="${item.category.displayName}">Category</span>
+                                <span th:class="'badge ' + (${item.status.name() == 'OPEN'} ? 'badge-open' : (${item.status.name() == 'CLAIM_PENDING'} ? 'badge-pending' : 'badge-resolved'))"
+                                      th:text="${item.status.displayName}">Status</span>
                             </div>
-                            <div class="item-row-meta">
-                                <a th:href="@{'/items/' + ${item.id}}" class="item-row-title" th:text="${item.title}">Item Title</a>
-                                <div class="item-row-details">
-                                    <span class="badge badge-category" th:text="${item.category.displayName}">Category</span>
-                                    <span>
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                        <strong th:text="${item.location}">Campus Location</strong>
-                                    </span>
-                                    <span>
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        <span th:text="${#temporals.format(item.eventDate, 'MMM dd, yyyy')}">Date</span>
-                                    </span>
-                                    <span th:class="'badge ' + (${item.status.name() == 'OPEN'} ? 'badge-open' : (${item.status.name() == 'CLAIM_PENDING'} ? 'badge-pending' : 'badge-resolved'))"
-                                          th:text="${item.status.displayName}">Status</span>
-                                </div>
+
+                            <a th:href="@{'/items/' + ${item.id}}" class="hud-item-title" th:text="${item.title}">Item Title</a>
+
+                            <div class="hud-item-meta">
+                                <span>
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    <strong th:text="${item.location}">Campus Location</strong>
+                                </span>
+                                <span>
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span th:text="${#temporals.format(item.eventDate, 'MMM dd, yyyy')}">Date</span>
+                                </span>
                             </div>
                         </div>
 
-                        <div class="item-row-right">
-                            <a th:href="@{'/matches/' + ${item.id}}" class="btn btn-sm btn-primary" title="View matching lost/found candidates">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+                            <a th:href="@{'/matches/' + ${item.id}}" class="btn btn-sm btn-primary" title="AI Match candidates">
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><path d="M21 21l-4.35-4.35" stroke-width="2"></path></svg>
                                 Matches
                             </a>
-                            <a th:if="${item.status.name() != 'RESOLVED'}" th:href="@{'/items/edit/' + ${item.id}}" class="btn btn-sm btn-outline-navy" title="Edit report details">
+                            <a th:if="${item.status.name() != 'RESOLVED'}" th:href="@{'/items/edit/' + ${item.id}}" class="btn btn-sm btn-outline-secondary" title="Edit report">
                                 Edit
                             </a>
-                            <a th:href="@{'/items/' + ${item.id}}" class="btn btn-sm btn-outline-navy" title="View full report">
+                            <a th:href="@{'/items/' + ${item.id}}" class="btn btn-sm btn-outline-secondary" title="View details">
                                 View
                             </a>
                         </div>
@@ -183,160 +177,186 @@
                 </div>
 
                 <!-- Empty State -->
-                <div th:unless="${myItems != null && !myItems.isEmpty()}" class="empty-state">
-                    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    <h3 class="empty-state-title">You haven't reported any items yet</h3>
-                    <p class="empty-state-text">If you misplaced property or found an item on campus, create your first report to activate our automated recovery engine.</p>
-                    <div class="d-flex justify-content-center gap-2">
+                <div th:unless="${myItems != null && !myItems.isEmpty()}" style="text-align: center; padding: 3rem 1.5rem; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 16px;">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #64748b; margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;">No Reports Created Yet</h3>
+                    <p style="color: #94a3b8; font-size: 0.9rem; max-width: 420px; margin: 0 auto 1.5rem;">Misplaced something or found an item on campus? Create a report to activate our automated recovery engine.</p>
+                    <div style="display: flex; justify-content: center; gap: 0.75rem;">
                         <a th:href="@{/items/report/lost}" class="btn btn-primary">Report Lost Item</a>
-                        <a th:href="@{/items/report/found}" class="btn btn-outline-navy">Report Found Item</a>
+                        <a th:href="@{/items/report/found}" class="btn btn-outline-secondary">Report Found Item</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: Incoming Claims to Review -->
+            <!-- Tab 2: Incoming Claims Pane -->
             <div id="incoming-claims-pane" class="tab-pane" style="display: none;">
                 <div th:if="${myReceivedClaims != null && !myReceivedClaims.isEmpty()}">
-                    <div th:each="c : ${myReceivedClaims}" class="claim-priority-card">
-                        <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
-                            <div class="d-flex align-items-center gap-2">
+                    <div th:each="c : ${myReceivedClaims}" class="hud-item-card" style="border-left: 4px solid #f59e0b;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
                                 <span class="badge badge-pending">Ownership Claim</span>
-                                <span style="font-size: 0.8rem; color: var(--color-slate-500);" th:text="'Submitted ' + ${#temporals.format(c.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                <span style="font-size: 0.8rem; color: #94a3b8;" th:text="'Received ' + ${#temporals.format(c.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                <span th:class="'badge ' + (${c.pending} ? 'badge-pending' : (${c.approved} ? 'badge-resolved' : 'badge-withdrawn'))"
+                                      th:text="${c.status.displayName}">Status</span>
                             </div>
-                            <span th:class="'badge ' + (${c.pending} ? 'badge-pending' : (${c.approved} ? 'badge-resolved' : 'badge-withdrawn'))"
-                                  th:text="${c.status.displayName}">Status</span>
+
+                            <h4 style="font-size: 1.15rem; margin-bottom: 0.35rem;">
+                                <a th:href="@{'/items/' + ${c.item.id}}" th:text="${c.item.title}" style="color: #ffffff; text-decoration: none;">Item Title</a>
+                            </h4>
+
+                            <div style="font-size: 0.875rem; color: #cbd5e1;">
+                                Claimant: <strong th:text="${c.claimant.fullName}">Claimant Name</strong> &bull;
+                                Phone: <span th:text="${c.contactPhone != null ? c.contactPhone : 'Not provided'}">Phone</span>
+                            </div>
                         </div>
 
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                            <div>
-                                <h4 style="font-size: 1.15rem; margin-bottom: 0.25rem;">
-                                    <a th:href="@{'/items/' + ${c.item.id}}" th:text="${c.item.title}" style="color: var(--color-navy-900);">Item Title</a>
-                                </h4>
-                                <div style="font-size: 0.875rem; color: var(--color-slate-600);">
-                                    Claimant: <strong th:text="${c.claimant.fullName}">Claimant Name</strong> &bull;
-                                    Phone: <span th:text="${c.contactPhone != null ? c.contactPhone : 'Not provided'}">Phone</span>
-                                </div>
-                            </div>
-                            <div>
-                                <a th:href="@{'/claims/review/' + ${c.id}}" class="btn btn-primary">
-                                    Review Ownership Evidence &rarr;
-                                </a>
-                            </div>
+                        <div>
+                            <a th:href="@{'/claims/review/' + ${c.id}}" class="btn btn-primary">
+                                Review Evidence &rarr;
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <div th:unless="${myReceivedClaims != null && !myReceivedClaims.isEmpty()}" class="empty-state">
-                    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <h3 class="empty-state-title">No incoming claims to review</h3>
-                    <p class="empty-state-text">When another student or campus member submits proof of ownership for items you reported, their claims will appear here for verification.</p>
+                <div th:unless="${myReceivedClaims != null && !myReceivedClaims.isEmpty()}" style="text-align: center; padding: 3rem 1.5rem; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 16px;">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #64748b; margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;">No Incoming Claims Pending</h3>
+                    <p style="color: #94a3b8; font-size: 0.9rem; max-width: 420px; margin: 0 auto;">When someone submits proof of ownership for items you reported, their claims will appear here for verification.</p>
                 </div>
             </div>
 
-            <!-- Tab 3: My Submitted Claims -->
+            <!-- Tab 3: My Claims Pane -->
             <div id="my-claims-pane" class="tab-pane" style="display: none;">
                 <div th:if="${mySubmittedClaims != null && !mySubmittedClaims.isEmpty()}">
-                    <div th:each="c : ${mySubmittedClaims}" class="item-row-card">
-                        <div class="item-row-left">
-                            <div class="item-type-avatar type-lost-avatar">
-                                <span>CLM</span>
+                    <div th:each="c : ${mySubmittedClaims}" class="hud-item-card" style="border-left: 4px solid #38bdf8;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                                <span class="badge badge-open">My Claim</span>
+                                <span style="font-size: 0.8rem; color: #94a3b8;" th:text="${#temporals.format(c.createdAt, 'MMM dd, yyyy')}">Date</span>
+                                <span th:class="'badge ' + (${c.pending} ? 'badge-pending' : (${c.approved} ? 'badge-resolved' : 'badge-withdrawn'))"
+                                      th:text="${c.status.displayName}">Status</span>
                             </div>
-                            <div class="item-row-meta">
-                                <a th:href="@{'/items/' + ${c.item.id}}" class="item-row-title" th:text="${c.item.title}">Item Title</a>
-                                <div class="item-row-details">
-                                    <span>
-                                        Reported by: <strong th:text="${c.item.user.fullName}">Reporter Name</strong>
-                                    </span>
-                                    <span>
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        <span th:text="${#temporals.format(c.createdAt, 'MMM dd, yyyy')}">Date</span>
-                                    </span>
-                                    <span th:class="'badge ' + (${c.pending} ? 'badge-pending' : (${c.approved} ? 'badge-resolved' : 'badge-withdrawn'))"
-                                          th:text="${c.status.displayName}">Pending</span>
-                                </div>
-                                <div th:if="${c.reviewerNotes != null && !c.reviewerNotes.empty}" style="margin-top: 0.35rem; font-size: 0.825rem; color: var(--color-slate-600); background: var(--color-slate-50); padding: 0.35rem 0.65rem; border-radius: var(--radius-sm); border: 1px solid var(--color-slate-200);">
-                                    <strong>Reporter Note:</strong> <span th:text="${c.reviewerNotes}">Notes</span>
-                                </div>
+
+                            <a th:href="@{'/items/' + ${c.item.id}}" class="hud-item-title" th:text="${c.item.title}">Item Title</a>
+
+                            <div class="hud-item-meta">
+                                <span>Reported by: <strong th:text="${c.item.user.fullName}">Reporter Name</strong></span>
+                            </div>
+
+                            <div th:if="${c.reviewerNotes != null && !c.reviewerNotes.empty}" style="margin-top: 0.5rem; font-size: 0.825rem; color: #cbd5e1; background: rgba(2, 6, 23, 0.5); padding: 0.4rem 0.75rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                <strong>Reporter Note:</strong> <span th:text="${c.reviewerNotes}">Notes</span>
                             </div>
                         </div>
 
-                        <div class="item-row-right">
-                            <a th:href="@{'/items/' + ${c.item.id}}" class="btn btn-sm btn-outline-navy">
+                        <div>
+                            <a th:href="@{'/items/' + ${c.item.id}}" class="btn btn-sm btn-outline-secondary">
                                 View Item
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div th:unless="${mySubmittedClaims != null && !mySubmittedClaims.isEmpty()}" class="empty-state">
-                    <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    <h3 class="empty-state-title">You haven't submitted any claims yet</h3>
-                    <p class="empty-state-text">If you find an item in the public inventory that matches your lost property, submit a private claim to recover it.</p>
-                    <a th:href="@{/items}" class="btn btn-outline-navy">Browse Found Items</a>
+                <div th:unless="${mySubmittedClaims != null && !mySubmittedClaims.isEmpty()}" style="text-align: center; padding: 3rem 1.5rem; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 16px;">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #64748b; margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;">No Submitted Claims</h3>
+                    <p style="color: #94a3b8; font-size: 0.9rem; max-width: 420px; margin: 0 auto 1.5rem;">If you see an item in the campus inventory that matches your lost property, submit a private claim to recover it.</p>
+                    <a th:href="@{/items}" class="btn btn-outline-secondary">Browse Campus Inventory</a>
                 </div>
             </div>
         </div>
 
-        <!-- Right Secondary Column (Live Feed & Recovery Tools) -->
+        <!-- Right Column: Live AI Radar & Campus Telemetry -->
         <div>
-            <!-- Live Activity & Notifications Feed -->
-            <div class="sidebar-panel-card">
-                <div class="sidebar-panel-header">
-                    <h3 class="sidebar-panel-title">
+            <!-- Live CSS Animated Radar Sweeper -->
+            <div class="radar-hub-widget">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="command-pulse-dot" style="background-color: #38bdf8; box-shadow: 0 0 10px #38bdf8;"></span>
+                        <strong style="color: #ffffff; font-size: 0.95rem;">AI Recovery Radar</strong>
+                    </div>
+                    <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">LIVE SCAN</span>
+                </div>
+
+                <!-- Animated Radar Scope -->
+                <div class="radar-scope-circle">
+                    <div class="radar-crosshair-h"></div>
+                    <div class="radar-crosshair-v"></div>
+                    <div class="radar-sweep-beam"></div>
+                    <div class="radar-blip b1"></div>
+                    <div class="radar-blip b2"></div>
+                </div>
+
+                <h4 style="font-size: 1.05rem; font-weight: 800; color: #ffffff; margin-bottom: 0.35rem; text-align: center;">
+                    5-Factor Deterministic Engine
+                </h4>
+                <p style="font-size: 0.8rem; color: #94a3b8; text-align: center; margin-bottom: 1.25rem;">
+                    Matches calculated via normalized weighted attributes:
+                </p>
+
+                <!-- Progress Breakdown -->
+                <div class="radar-factor-list">
+                    <div class="radar-factor-row">
+                        <div style="display: flex; justify-content: space-between;"><span>Category Weight</span><strong>30%</strong></div>
+                        <div class="radar-progress-bar"><div class="radar-progress-fill" style="width: 30%;"></div></div>
+                    </div>
+                    <div class="radar-factor-row">
+                        <div style="display: flex; justify-content: space-between;"><span>Color Match</span><strong>20%</strong></div>
+                        <div class="radar-progress-bar"><div class="radar-progress-fill" style="width: 20%;"></div></div>
+                    </div>
+                    <div class="radar-factor-row">
+                        <div style="display: flex; justify-content: space-between;"><span>Location Area</span><strong>20%</strong></div>
+                        <div class="radar-progress-bar"><div class="radar-progress-fill" style="width: 20%;"></div></div>
+                    </div>
+                    <div class="radar-factor-row">
+                        <div style="display: flex; justify-content: space-between;"><span>Date Proximity</span><strong>15%</strong></div>
+                        <div class="radar-progress-bar"><div class="radar-progress-fill" style="width: 15%;"></div></div>
+                    </div>
+                    <div class="radar-factor-row">
+                        <div style="display: flex; justify-content: space-between;"><span>Description Similarity</span><strong>15%</strong></div>
+                        <div class="radar-progress-bar"><div class="radar-progress-fill" style="width: 15%;"></div></div>
+                    </div>
+                </div>
+
+                <a th:href="@{/matches}" class="btn-command-radar" style="width: 100%; justify-content: center; text-align: center;">
+                    View Match Suggestions &rarr;
+                </a>
+            </div>
+
+            <!-- Live Campus Activity Feed -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 1.5rem; margin-bottom: 1.5rem; backdrop-filter: blur(16px);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         Activity Feed
                     </h3>
-                    <a th:href="@{/notifications}" style="font-size: 0.8rem; font-weight: 600; color: var(--color-blue-600);">View All</a>
+                    <a th:href="@{/notifications}" style="font-size: 0.8rem; font-weight: 600; color: #38bdf8; text-decoration: none;">View All</a>
                 </div>
 
                 <div th:if="${recentNotifications != null && !recentNotifications.isEmpty()}">
-                    <div th:each="n, stat : ${recentNotifications}" th:if="${stat.index < 4}" class="feed-item">
-                        <div th:class="'feed-bullet ' + (${!n.read} ? 'unread' : '')"></div>
+                    <div th:each="n, stat : ${recentNotifications}" th:if="${stat.index < 4}" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                        <div th:class="'feed-bullet ' + (${!n.read} ? 'unread' : '')" style="margin-top: 0.4rem;"></div>
                         <div style="flex: 1; min-width: 0;">
-                            <a th:href="${n.linkUrl != null ? n.linkUrl : '/notifications'}" class="feed-title" style="text-decoration: none; display: block;" th:text="${n.title}">Notification Title</a>
-                            <div style="font-size: 0.8rem; color: var(--color-slate-600); margin-bottom: 0.15rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                            <a th:href="${n.linkUrl != null ? n.linkUrl : '/notifications'}" style="color: #f1f5f9; font-weight: 600; text-decoration: none; font-size: 0.875rem;" th:text="${n.title}">Notification Title</a>
+                            <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.15rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
                                  th:text="${n.message}">Message</div>
-                            <div class="feed-time" th:text="${#temporals.format(n.createdAt, 'MMM dd, HH:mm')}">Time</div>
+                            <div style="font-size: 0.75rem; color: #64748b;" th:text="${#temporals.format(n.createdAt, 'MMM dd, HH:mm')}">Time</div>
                         </div>
                     </div>
                 </div>
 
-                <div th:unless="${recentNotifications != null && !recentNotifications.isEmpty()}" style="text-align: center; padding: 1.5rem 0; color: var(--color-slate-400); font-size: 0.875rem;">
-                    No recent activity notifications.
+                <div th:unless="${recentNotifications != null && !recentNotifications.isEmpty()}" style="text-align: center; padding: 1.5rem 0; color: #64748b; font-size: 0.875rem;">
+                    No recent campus activity notifications.
                 </div>
             </div>
 
-            <!-- Deterministic Match Engine Radar -->
-            <div class="sidebar-panel-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span style="background: rgba(37, 99, 235, 0.25); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); padding: 0.2rem 0.6rem; border-radius: var(--radius-full); font-size: 0.725rem; font-weight: 700; text-transform: uppercase;">
-                        Algorithm Radar
-                    </span>
+            <!-- Safe Property Handover Protocol -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid #38bdf8; border-radius: 18px; padding: 1.25rem 1.5rem; backdrop-filter: blur(16px);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #38bdf8;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <strong style="color: #ffffff; font-size: 0.95rem;">Designated Safe Handover Zones</strong>
                 </div>
-                <h4 style="font-size: 1.15rem; font-weight: 800; color: white; margin-bottom: 0.5rem;">5-Factor Matching</h4>
-                <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.5; margin-bottom: 1rem;">
-                    FindIt cross-analyzes reports using deterministic scoring:
-                </p>
-                <div style="font-size: 0.8rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem;">
-                    <div class="d-flex justify-content-between"><span>Category</span><strong>30%</strong></div>
-                    <div class="d-flex justify-content-between"><span>Color Match</span><strong>20%</strong></div>
-                    <div class="d-flex justify-content-between"><span>Location Area</span><strong>20%</strong></div>
-                    <div class="d-flex justify-content-between"><span>Date Proximity</span><strong>15%</strong></div>
-                    <div class="d-flex justify-content-between"><span>Description Similarity</span><strong>15%</strong></div>
-                </div>
-                <a th:href="@{/matches}" class="btn btn-sm btn-hero-glass" style="width: 100%; text-align: center;">
-                    Explore Match Suggestions &rarr;
-                </a>
-            </div>
-
-            <!-- Campus Safe Exchange Protocol -->
-            <div class="sidebar-panel-card" style="border-left: 4px solid var(--color-blue-500);">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--color-blue-600);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                    <strong style="color: var(--color-navy-900); font-size: 0.95rem;">Safe Exchange Zones</strong>
-                </div>
-                <p style="font-size: 0.825rem; color: var(--color-slate-600); line-height: 1.5; margin: 0;">
-                    To protect both finder and claimant, meet at designated campus safe exchange locations: <strong>Library Circulation Desk</strong> or <strong>Campus Safety Center</strong>.
+                <p style="font-size: 0.825rem; color: #94a3b8; line-height: 1.5; margin: 0;">
+                    To protect finder and claimant safety, meet exclusively at verified campus hubs: <strong>Library Circulation Desk</strong> or <strong>Campus Security Headquarters</strong>.
                 </p>
             </div>
         </div>

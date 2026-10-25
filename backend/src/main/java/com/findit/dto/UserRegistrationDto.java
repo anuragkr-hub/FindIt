@@ -24,6 +24,8 @@ public class UserRegistrationDto {
     @NotBlank(message = "Please confirm your password")
     private String confirmPassword;
 
+    private String otpCode;
+
     public UserRegistrationDto() {
     }
 
@@ -65,6 +67,14 @@ public class UserRegistrationDto {
 
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
+    }
+
+    public String getOtpCode() {
+        return otpCode;
+    }
+
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
     }
 
     public boolean isPasswordMatching() {

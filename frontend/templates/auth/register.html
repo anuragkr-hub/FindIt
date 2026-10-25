@@ -1,56 +1,113 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{})}">
+      th:replace="~{layout/base :: layout(~{::title}, ~{::content}, ~{}, ~{::scripts})}">
 <head>
-    <title>Create Account | FindIt</title>
+    <title>Create Verified Account | FindIt Campus Safety</title>
 </head>
 <body>
 <div th:fragment="content">
-    <div style="max-width: 500px; margin: 2rem auto;">
-        <div class="card" style="box-shadow: var(--shadow-xl); border-radius: var(--radius-xl);">
-            <div class="card-body" style="padding: 2.5rem 2rem;">
+    <div style="max-width: 540px; margin: 1.5rem auto;">
+        <div class="card otp-auth-card">
+            <div class="card-body" style="padding: 2.25rem 2rem;">
                 <!-- Header -->
                 <div class="text-center mb-4">
-                    <img th:src="@{/img/logo.png}" alt="FindIt Logo" style="width: 72px; height: 72px; object-fit: contain; margin: 0 auto 1rem; display: block; border-radius: var(--radius-lg); box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: white; padding: 4px;">
-                    <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Create Your Account</h1>
-                    <p class="text-muted" style="font-size: 0.9rem;">Join the campus community to track and recover belongings</p>
+                    <img th:src="@{/img/logo.png}" alt="FindIt Logo" style="width: 72px; height: 72px; object-fit: contain; margin: 0 auto 1rem; display: block; border-radius: 16px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); background: #0f172a; padding: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">
+                    <h1 style="font-size: 1.75rem; margin-bottom: 0.35rem; color: #ffffff; font-weight: 800;">Create Verified Account</h1>
+                    <p style="font-size: 0.875rem; color: #94a3b8; margin: 0;">
+                        Campus Identity Shield: Real-time OTP verification prevents fake emails and phone numbers.
+                    </p>
                 </div>
 
                 <!-- Registration Form -->
-                <form th:action="@{/register}" th:object="${userDto}" method="post" novalidate>
+                <form id="registrationForm" th:action="@{/register}" th:object="${userDto}" method="post" novalidate>
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <!-- Hidden OTP Code submitted with form -->
+                    <input type="hidden" id="otpCode" th:field="*{otpCode}" />
 
                     <!-- Full Name -->
                     <div class="form-group mb-3">
-                        <label for="fullName" class="form-label">Full Name <span class="required">*</span></label>
+                        <label for="fullName" class="form-label" style="color: #cbd5e1; font-weight: 600;">Full Name <span class="required" style="color: #f87171;">*</span></label>
                         <input type="text" id="fullName" th:field="*{fullName}"
                                th:class="'form-control ' + (${#fields.hasErrors('fullName')} ? 'is-invalid' : '')"
                                placeholder="e.g. Alex Rivera" required>
                         <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="invalid-feedback">Full name is required</div>
                     </div>
 
-                    <!-- Email -->
+                    <!-- Email with OTP Trigger -->
                     <div class="form-group mb-3">
-                        <label for="email" class="form-label">Campus Email <span class="required">*</span></label>
-                        <input type="email" id="email" th:field="*{email}"
-                               th:class="'form-control ' + (${#fields.hasErrors('email')} ? 'is-invalid' : '')"
-                               placeholder="e.g. alex@campus.edu" required>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                            <label for="email" class="form-label" style="color: #cbd5e1; font-weight: 600; margin: 0;">
+                                Campus Email <span class="required" style="color: #f87171;">*</span>
+                            </label>
+                            <span id="emailVerifiedBadge" class="verified-shield-badge" style="display: none;">
+                                &#10003; Email Verified
+                            </span>
+                        </div>
+                        <div class="input-group" style="display: flex; gap: 0.5rem;">
+                            <input type="email" id="email" th:field="*{email}"
+                                   th:class="'form-control ' + (${#fields.hasErrors('email')} ? 'is-invalid' : '')"
+                                   placeholder="e.g. alex@campus.edu" required style="flex: 1;">
+                            <button type="button" class="btn btn-outline-secondary" id="sendEmailOtpBtn" style="white-space: nowrap; font-size: 0.85rem;">
+                                Send OTP
+                            </button>
+                        </div>
                         <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="invalid-feedback">Valid email is required</div>
+                        <div id="emailOtpStatus" class="otp-status-message"></div>
                     </div>
 
-                    <!-- Phone -->
+                    <!-- Phone Number with Optional OTP Trigger -->
                     <div class="form-group mb-3">
-                        <label for="phone" class="form-label">Phone Number (Optional)</label>
-                        <input type="tel" id="phone" th:field="*{phone}"
-                               th:class="'form-control ' + (${#fields.hasErrors('phone')} ? 'is-invalid' : '')"
-                               placeholder="e.g. 555-0101">
-                        <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="invalid-feedback">Invalid phone</div>
-                        <div class="form-text">Facilitates safe property handover for approved claims.</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                            <label for="phone" class="form-label" style="color: #cbd5e1; font-weight: 600; margin: 0;">
+                                Mobile Phone (For SMS &amp; Recovery Handover)
+                            </label>
+                            <span id="phoneVerifiedBadge" class="verified-shield-badge" style="display: none;">
+                                &#10003; Phone Verified
+                            </span>
+                        </div>
+                        <div class="input-group" style="display: flex; gap: 0.5rem;">
+                            <input type="tel" id="phone" th:field="*{phone}"
+                                   th:class="'form-control ' + (${#fields.hasErrors('phone')} ? 'is-invalid' : '')"
+                                   placeholder="e.g. 555-0101" style="flex: 1;">
+                            <button type="button" class="btn btn-outline-secondary" id="sendPhoneOtpBtn" style="white-space: nowrap; font-size: 0.85rem;">
+                                Send Phone OTP
+                            </button>
+                        </div>
+                        <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="invalid-feedback">Invalid phone number</div>
+                        <div id="phoneOtpStatus" class="otp-status-message"></div>
+                    </div>
+
+                    <!-- OTP Code Entry Box (Appears when OTP is requested) -->
+                    <div id="otpVerificationSection" style="display: none; background: rgba(2, 6, 23, 0.65); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem;">
+                            <strong style="color: #38bdf8; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                Enter 6-Digit Verification Code
+                            </strong>
+                            <span id="otpTargetDisplay" style="font-size: 0.775rem; color: #94a3b8;"></span>
+                        </div>
+
+                        <div style="display: flex; gap: 0.65rem; margin-bottom: 0.5rem;">
+                            <input type="text" id="otpCodeInput" maxlength="6" class="form-control otp-code-input" placeholder="000000" style="flex: 1;">
+                            <button type="button" class="btn btn-primary" id="verifyOtpBtn" style="font-weight: 700; white-space: nowrap;">
+                                Verify Code
+                            </button>
+                        </div>
+
+                        <div id="otpVerifyStatus" class="otp-status-message"></div>
+                        <div style="font-size: 0.775rem; color: #64748b; line-height: 1.4;">
+                            A 6-digit code was dispatched to your destination. Check your email or console log.
+                        </div>
+                    </div>
+
+                    <!-- Backend OTP field error if present -->
+                    <div th:if="${#fields.hasErrors('otpCode')}" class="alert alert-danger mb-3" style="font-size: 0.85rem;" th:errors="*{otpCode}">
+                        Invalid OTP Code
                     </div>
 
                     <!-- Password -->
                     <div class="form-group mb-3">
-                        <label for="password" class="form-label">Password <span class="required">*</span></label>
+                        <label for="password" class="form-label" style="color: #cbd5e1; font-weight: 600;">Password <span class="required" style="color: #f87171;">*</span></label>
                         <input type="password" id="password" th:field="*{password}"
                                th:class="'form-control ' + (${#fields.hasErrors('password')} ? 'is-invalid' : '')"
                                placeholder="At least 6 characters" required>
@@ -59,26 +116,133 @@
 
                     <!-- Confirm Password -->
                     <div class="form-group mb-4">
-                        <label for="confirmPassword" class="form-label">Confirm Password <span class="required">*</span></label>
+                        <label for="confirmPassword" class="form-label" style="color: #cbd5e1; font-weight: 600;">Confirm Password <span class="required" style="color: #f87171;">*</span></label>
                         <input type="password" id="confirmPassword" th:field="*{confirmPassword}"
                                th:class="'form-control ' + (${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : '')"
                                placeholder="Re-enter password" required>
                         <div th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="invalid-feedback">Passwords must match</div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 1.25rem;">
-                        Register Account
+                    <!-- Submit Register Button -->
+                    <button type="submit" id="registerSubmitBtn" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 1.25rem; font-weight: 800; letter-spacing: 0.02em;">
+                        Complete Verified Registration
                     </button>
                 </form>
 
                 <!-- Login Link -->
-                <div class="text-center" style="font-size: 0.9rem; color: var(--color-slate-600);">
+                <div class="text-center" style="font-size: 0.9rem; color: #94a3b8;">
                     Already registered?
-                    <a th:href="@{/login}" style="font-weight: 600;">Sign in here</a>
+                    <a th:href="@{/login}" style="font-weight: 700; color: #38bdf8;">Sign in here &rarr;</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<th:block th:fragment="scripts">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let activeTarget = '';
+    let isVerified = false;
+
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const sendEmailBtn = document.getElementById('sendEmailOtpBtn');
+    const sendPhoneBtn = document.getElementById('sendPhoneOtpBtn');
+    const verifyBtn = document.getElementById('verifyOtpBtn');
+    const otpInput = document.getElementById('otpCodeInput');
+    const hiddenOtp = document.getElementById('otpCode');
+    const otpSection = document.getElementById('otpVerificationSection');
+    const targetDisplay = document.getElementById('otpTargetDisplay');
+    const form = document.getElementById('registrationForm');
+
+    // Trigger Email OTP
+    sendEmailBtn.addEventListener('click', function() {
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) {
+            FindItOTP.showStatus('emailOtpStatus', 'Please enter a valid campus email address first.', 'error');
+            emailInput.focus();
+            return;
+        }
+        activeTarget = email;
+        targetDisplay.textContent = `Sent to ${email}`;
+        FindItOTP.sendOtp({
+            target: email,
+            purpose: 'REGISTRATION',
+            buttonEl: sendEmailBtn,
+            statusEl: 'emailOtpStatus',
+            codeContainerEl: otpSection,
+            autoFillInputEl: otpInput
+        });
+    });
+
+    // Trigger Phone OTP
+    sendPhoneBtn.addEventListener('click', function() {
+        const phone = phoneInput.value.trim();
+        if (!phone || phone.length < 7) {
+            FindItOTP.showStatus('phoneOtpStatus', 'Please enter a valid mobile number first.', 'error');
+            phoneInput.focus();
+            return;
+        }
+        activeTarget = phone;
+        targetDisplay.textContent = `Sent to ${phone}`;
+        FindItOTP.sendOtp({
+            target: phone,
+            purpose: 'REGISTRATION',
+            buttonEl: sendPhoneBtn,
+            statusEl: 'phoneOtpStatus',
+            codeContainerEl: otpSection,
+            autoFillInputEl: otpInput
+        });
+    });
+
+    // Verify OTP Button
+    verifyBtn.addEventListener('click', function() {
+        const code = otpInput.value.trim();
+        if (!activeTarget) {
+            FindItOTP.showStatus('otpVerifyStatus', 'Please request an OTP first.', 'error');
+            return;
+        }
+
+        FindItOTP.verifyOtp({
+            target: activeTarget,
+            code: code,
+            purpose: 'REGISTRATION',
+            verifyBtnEl: verifyBtn,
+            statusEl: 'otpVerifyStatus',
+            onSuccess: function() {
+                isVerified = true;
+                hiddenOtp.value = code;
+
+                if (activeTarget.includes('@')) {
+                    document.getElementById('emailVerifiedBadge').style.display = 'inline-flex';
+                    emailInput.readOnly = true;
+                } else {
+                    document.getElementById('phoneVerifiedBadge').style.display = 'inline-flex';
+                    phoneInput.readOnly = true;
+                }
+
+                FindItOTP.showStatus('otpVerifyStatus', '&#10003; Verification Complete! You may now submit registration.', 'success');
+            }
+        });
+    });
+
+    // Client-side guard on form submission
+    form.addEventListener('submit', function(e) {
+        if (!isVerified && !hiddenOtp.value) {
+            // Check if user has entered an OTP in the box
+            if (otpInput && otpInput.value.trim().length === 6) {
+                hiddenOtp.value = otpInput.value.trim();
+                return; // allow submission to backend validator
+            }
+            // If neither verified nor supplied, prompt user
+            e.preventDefault();
+            FindItOTP.showStatus('emailOtpStatus', 'Security Requirement: Please verify your Email or Phone with the 6-digit OTP code before registering.', 'error');
+            sendEmailBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+});
+</script>
+</th:block>
 </body>
 </html>
