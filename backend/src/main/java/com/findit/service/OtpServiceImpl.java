@@ -20,6 +20,7 @@ public class OtpServiceImpl implements OtpService {
     private static final SecureRandom secureRandom = new SecureRandom();
 
     private final EmailService emailService;
+    private final SmsService smsService;
     private final Map<String, OtpRecord> otpStore = new ConcurrentHashMap<>();
 
     private record OtpRecord(String code, Instant expiry, OtpPurpose purpose) {
@@ -30,11 +31,18 @@ public class OtpServiceImpl implements OtpService {
 
     public OtpServiceImpl() {
         this.emailService = null;
+        this.smsService = null;
+    }
+
+    public OtpServiceImpl(EmailService emailService) {
+        this.emailService = emailService;
+        this.smsService = null;
     }
 
     @Autowired
-    public OtpServiceImpl(EmailService emailService) {
+    public OtpServiceImpl(EmailService emailService, SmsService smsService) {
         this.emailService = emailService;
+        this.smsService = smsService;
     }
 
     @Override
@@ -51,32 +59,44 @@ public class OtpServiceImpl implements OtpService {
         otpStore.put(cacheKey, new OtpRecord(code, expiry, purpose));
 
         String masked = maskTarget(target);
-
-        // If target is an email address, trigger real SMTP email dispatch
         boolean isEmail = normalizedTarget.contains("@");
-        boolean sentViaSmtp = false;
+        boolean sentReal = false;
 
         if (isEmail && emailService != null) {
-            sentViaSmtp = emailService.sendOtpEmail(normalizedTarget, code, purpose.getDescription());
+            sentReal = emailService.sendOtpEmail(normalizedTarget, code, purpose.getDescription());
+        } else if (!isEmail && smsService != null) {
+            sentReal = smsService.sendOtpSms(normalizedTarget, code);
         }
 
-        // Server terminal log for administrator monitoring
         log.info("\n" +
                 "======================================================================\n" +
                 " [FINDIT SECURITY GATEWAY] VERIFICATION OTP DISPATCHED\n" +
                 " Destination : {}\n" +
-                " Real Email  : {}\n" +
+                " Gateway Delivery: {}\n" +
                 " Purpose     : {}\n" +
                 " Code (OTP)  : {}\n" +
                 " Valid For   : {} seconds\n" +
                 "======================================================================",
-                normalizedTarget, (sentViaSmtp ? "SENT TO INBOX" : "SMTP Credentials Not Set / Check Console"), purpose.getDescription(), code, OTP_EXPIRY_SECONDS);
+                normalizedTarget, (sentReal ? "DELIVERED TO REAL INBOX/PHONE" : "GATEWAY NOT CONFIGURED / TERMINAL LOGGED"), purpose.getDescription(), code, OTP_EXPIRY_SECONDS);
 
-        String channel = isEmail ? "your email (" + masked + ")" : "your mobile phone (" + masked + ")";
-        String userMessage = "A 6-digit verification code has been dispatched to " + channel + ". Please check your inbox or spam folder.";
-
-        // Security: NEVER expose the raw OTP in the HTTP response JSON
-        return OtpResponseDto.success(userMessage, masked, OTP_EXPIRY_SECONDS);
+        String userMessage;
+        if (sentReal) {
+            if (isEmail) {
+                userMessage = "✓ Real OTP sent to your email (" + masked + ")! Please check your inbox and spam folder.";
+            } else {
+                userMessage = "✓ Real OTP sent to your mobile phone (" + masked + ") via SMS! Please check your messages.";
+            }
+            // Real delivery successful: NEVER return code in HTTP JSON
+            return OtpResponseDto.success(userMessage, masked, OTP_EXPIRY_SECONDS);
+        } else {
+            if (isEmail) {
+                userMessage = "Email Gateway Notice: Real SMTP is not yet configured on this server. For local testing, your verification code is: " + code + ". (Add your Gmail & App Password in application.properties to send real emails to your inbox.)";
+            } else {
+                userMessage = "SMS Gateway Notice: Real SMS API key (Fast2SMS/Twilio) is not yet configured. For local testing, your verification code is: " + code + ". (Add FAST2SMS_API_KEY to send real SMS to mobile phones.)";
+            }
+            // Fallback for unconfigured gateways so user is not blocked
+            return OtpResponseDto.success(userMessage, masked, code, OTP_EXPIRY_SECONDS);
+        }
     }
 
     @Override

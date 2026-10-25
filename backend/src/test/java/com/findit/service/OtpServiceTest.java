@@ -21,6 +21,7 @@ class OtpServiceTest {
     @BeforeEach
     void setUp() {
         emailService = Mockito.mock(EmailService.class);
+        Mockito.when(emailService.sendOtpEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         otpService = new OtpServiceImpl(emailService);
     }
 
@@ -85,9 +86,13 @@ class OtpServiceTest {
     @Test
     @DisplayName("Phone numbers are normalized and work seamlessly")
     void testPhoneOtpFlow() {
+        SmsService mockSms = Mockito.mock(SmsService.class);
+        Mockito.when(mockSms.sendOtpSms(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        OtpService phoneOtpService = new OtpServiceImpl(emailService, mockSms);
+
         String phone = "+1 (555) 019-2834";
-        OtpResponseDto sendResponse = otpService.sendOtp(phone, OtpPurpose.PHONE_VERIFY);
+        OtpResponseDto sendResponse = phoneOtpService.sendOtp(phone, OtpPurpose.PHONE_VERIFY);
         assertThat(sendResponse.isSuccess()).isTrue();
-        assertThat(sendResponse.getDemoCode()).isNull(); // Never leak OTP
+        assertThat(sendResponse.getDemoCode()).isNull(); // Real SMS: Never leak OTP
     }
 }

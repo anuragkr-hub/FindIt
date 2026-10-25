@@ -57,6 +57,15 @@
                     }
                 }
 
+                // If gateway is in local fallback mode (credentials not yet set), auto-populate for testing
+                if (data.demoCode && autoFillInputEl) {
+                    const targetInput = typeof autoFillInputEl === 'string' ? document.getElementById(autoFillInputEl) : autoFillInputEl;
+                    if (targetInput) {
+                        targetInput.value = data.demoCode;
+                        targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }
+
                 // Start countdown timer on send button
                 this.startCountdown(sendBtn, data.expirySeconds || 300, originalText);
 

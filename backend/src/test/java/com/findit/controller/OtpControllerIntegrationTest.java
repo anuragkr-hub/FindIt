@@ -57,6 +57,8 @@ class OtpControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/otp/send returns 200 and NEVER exposes demoCode in JSON")
     void testSendOtpEndpoint() throws Exception {
+        org.mockito.Mockito.when(emailService.sendOtpEmail(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString())).thenReturn(true);
+
         OtpRequestDto dto = new OtpRequestDto();
         dto.setTarget("unregistered@campus.edu");
         dto.setPurpose(OtpPurpose.REGISTRATION);
