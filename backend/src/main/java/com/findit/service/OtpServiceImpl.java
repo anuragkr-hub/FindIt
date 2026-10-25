@@ -4,6 +4,7 @@ import com.findit.dto.OtpResponseDto;
 import com.findit.model.enums.OtpPurpose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -18,12 +19,22 @@ public class OtpServiceImpl implements OtpService {
     private static final int OTP_EXPIRY_SECONDS = 300; // 5 minutes
     private static final SecureRandom secureRandom = new SecureRandom();
 
+    private final EmailService emailService;
     private final Map<String, OtpRecord> otpStore = new ConcurrentHashMap<>();
 
     private record OtpRecord(String code, Instant expiry, OtpPurpose purpose) {
         boolean isExpired() {
             return Instant.now().isAfter(expiry);
         }
+    }
+
+    public OtpServiceImpl() {
+        this.emailService = null;
+    }
+
+    @Autowired
+    public OtpServiceImpl(EmailService emailService) {
+        this.emailService = emailService;
     }
 
     @Override
@@ -41,19 +52,31 @@ public class OtpServiceImpl implements OtpService {
 
         String masked = maskTarget(target);
 
-        // Simulation log for developers & console oversight
+        // If target is an email address, trigger real SMTP email dispatch
+        boolean isEmail = normalizedTarget.contains("@");
+        boolean sentViaSmtp = false;
+
+        if (isEmail && emailService != null) {
+            sentViaSmtp = emailService.sendOtpEmail(normalizedTarget, code, purpose.getDescription());
+        }
+
+        // Server terminal log for administrator monitoring
         log.info("\n" +
                 "======================================================================\n" +
                 " [FINDIT SECURITY GATEWAY] VERIFICATION OTP DISPATCHED\n" +
                 " Destination : {}\n" +
+                " Real Email  : {}\n" +
                 " Purpose     : {}\n" +
                 " Code (OTP)  : {}\n" +
                 " Valid For   : {} seconds\n" +
                 "======================================================================",
-                normalizedTarget, purpose.getDescription(), code, OTP_EXPIRY_SECONDS);
+                normalizedTarget, (sentViaSmtp ? "SENT TO INBOX" : "SMTP Credentials Not Set / Check Console"), purpose.getDescription(), code, OTP_EXPIRY_SECONDS);
 
-        String userMessage = "A 6-digit verification code has been dispatched to " + masked + ".";
-        return OtpResponseDto.success(userMessage, masked, code, OTP_EXPIRY_SECONDS);
+        String channel = isEmail ? "your email (" + masked + ")" : "your mobile phone (" + masked + ")";
+        String userMessage = "A 6-digit verification code has been dispatched to " + channel + ". Please check your inbox or spam folder.";
+
+        // Security: NEVER expose the raw OTP in the HTTP response JSON
+        return OtpResponseDto.success(userMessage, masked, OTP_EXPIRY_SECONDS);
     }
 
     @Override
@@ -100,28 +123,31 @@ public class OtpServiceImpl implements OtpService {
         if (trimmed.contains("@")) {
             return trimmed.toLowerCase();
         }
-        // Normalize phone number (strip whitespace and common delimiters)
-        return trimmed.replaceAll("[^0-9+]", "");
-    }
-
-    private String buildKey(String target, OtpPurpose purpose) {
-        return (purpose != null ? purpose.name() : "GENERAL") + ":" + target;
+        // Normalize phone number to digits only
+        String digits = trimmed.replaceAll("[^0-9+]", "");
+        return digits;
     }
 
     private String maskTarget(String target) {
-        if (target == null || target.length() < 4) return "****";
-        if (target.contains("@")) {
-            String[] parts = target.split("@");
-            String name = parts[0];
-            String domain = parts[1];
-            String maskedName = name.length() > 2 ? name.substring(0, 2) + "***" : name + "***";
-            return maskedName + "@" + domain;
-        } else {
-            String digits = target.replaceAll("[^0-9]", "");
-            if (digits.length() > 4) {
-                return "***-***-" + digits.substring(digits.length() - 4);
+        String trimmed = target.trim();
+        if (trimmed.contains("@")) {
+            int atIndex = trimmed.indexOf('@');
+            String name = trimmed.substring(0, atIndex);
+            String domain = trimmed.substring(atIndex);
+            if (name.length() <= 2) {
+                return name + "***" + domain;
             }
-            return "***-" + digits;
+            return name.substring(0, 2) + "***" + domain;
+        } else {
+            String digits = trimmed.replaceAll("[^0-9]", "");
+            if (digits.length() <= 4) {
+                return "***" + digits;
+            }
+            return "***-***-" + digits.substring(digits.length() - 4);
         }
+    }
+
+    private String buildKey(String target, OtpPurpose purpose) {
+        return purpose.name() + ":" + target;
     }
 }

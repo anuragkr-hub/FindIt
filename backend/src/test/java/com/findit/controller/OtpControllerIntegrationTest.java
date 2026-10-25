@@ -3,22 +3,29 @@ package com.findit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findit.dto.OtpRequestDto;
 import com.findit.dto.OtpVerificationDto;
+import com.findit.model.User;
 import com.findit.model.enums.OtpPurpose;
 import com.findit.model.enums.Role;
-import com.findit.model.User;
 import com.findit.repository.UserRepository;
+import com.findit.service.EmailService;
 import com.findit.service.OtpService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -44,8 +51,11 @@ class OtpControllerIntegrationTest {
     @Autowired
     private OtpService otpService;
 
+    @MockBean
+    private EmailService emailService;
+
     @Test
-    @DisplayName("POST /api/otp/send returns 200 and demoCode for registration")
+    @DisplayName("POST /api/otp/send returns 200 and NEVER exposes demoCode in JSON")
     void testSendOtpEndpoint() throws Exception {
         OtpRequestDto dto = new OtpRequestDto();
         dto.setTarget("unregistered@campus.edu");
@@ -56,7 +66,12 @@ class OtpControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.demoCode").isNotEmpty());
+                .andExpect(jsonPath("$.demoCode").isEmpty());
+
+        // Verify email dispatch was triggered with 6-digit code
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(emailService).sendOtpEmail(eq("unregistered@campus.edu"), captor.capture(), anyString());
+        assertThat(captor.getValue()).hasSize(6).matches("\\d{6}");
     }
 
     @Test
@@ -75,14 +90,18 @@ class OtpControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /api/otp/verify validates matching code and returns 200")
+    @DisplayName("POST /api/otp/verify validates matching code received in email and returns 200")
     void testVerifyOtpEndpoint() throws Exception {
         String target = "verifytest@campus.edu";
-        var sendResp = otpService.sendOtp(target, OtpPurpose.REGISTRATION);
+        otpService.sendOtp(target, OtpPurpose.REGISTRATION);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(emailService).sendOtpEmail(eq(target), captor.capture(), anyString());
+        String codeSentToInbox = captor.getValue();
 
         OtpVerificationDto verifyDto = new OtpVerificationDto();
         verifyDto.setTarget(target);
-        verifyDto.setCode(sendResp.getDemoCode());
+        verifyDto.setCode(codeSentToInbox);
         verifyDto.setPurpose(OtpPurpose.REGISTRATION);
 
         mockMvc.perform(post("/api/otp/verify")
@@ -93,7 +112,7 @@ class OtpControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /login/otp logs in registered user with valid OTP and redirects to /dashboard")
+    @DisplayName("POST /login/otp logs in registered user with valid OTP sent to email and redirects to /dashboard")
     void testLoginWithOtpSuccess() throws Exception {
         // Create user in test DB
         User user = new User();
@@ -106,13 +125,17 @@ class OtpControllerIntegrationTest {
         userRepository.save(user);
 
         // Send OTP
-        var sendResp = otpService.sendOtp("otpuser@campus.edu", OtpPurpose.LOGIN);
+        otpService.sendOtp("otpuser@campus.edu", OtpPurpose.LOGIN);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(emailService).sendOtpEmail(eq("otpuser@campus.edu"), captor.capture(), anyString());
+        String codeSentToInbox = captor.getValue();
 
         // Submit login via OTP
         mockMvc.perform(post("/login/otp")
                         .with(csrf())
                         .param("target", "otpuser@campus.edu")
-                        .param("otpCode", sendResp.getDemoCode()))
+                        .param("otpCode", codeSentToInbox))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/dashboard"));
     }

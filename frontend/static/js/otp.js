@@ -1,6 +1,7 @@
 /**
  * FindIt - OTP Security Gateway & Identity Verification System
- * Handles client-side OTP dispatch, countdown timers, verification, and instant OTP login.
+ * Dispatches real verification codes via SMTP email and validates input.
+ * Security: Verification codes are NEVER displayed in the browser or HTTP responses.
  */
 (function() {
     'use strict';
@@ -9,10 +10,10 @@
         timers: {},
 
         /**
-         * Dispatches an OTP to the given target (email or mobile)
+         * Dispatches a real OTP to the given target (email or mobile)
          */
         sendOtp: function(options) {
-            const { target, purpose, buttonEl, statusEl, codeContainerEl, autoFillInputEl, onDispatched } = options;
+            const { target, purpose, buttonEl, statusEl, codeContainerEl, onDispatched } = options;
             if (!target || !target.trim()) {
                 this.showStatus(statusEl, 'Please enter a valid campus email or phone number first.', 'error');
                 return;
@@ -23,7 +24,7 @@
 
             if (sendBtn) {
                 sendBtn.disabled = true;
-                sendBtn.innerHTML = '<span class="otp-spinner"></span> Sending...';
+                sendBtn.innerHTML = '<span class="otp-spinner"></span> Sending to Inbox...';
             }
             this.showStatus(statusEl, 'Connecting to security gateway...', 'info');
 
@@ -45,7 +46,7 @@
                 }
 
                 const data = result.body;
-                this.showStatus(statusEl, data.message || 'Verification code sent successfully!', 'success');
+                this.showStatus(statusEl, data.message || 'Verification code dispatched to your inbox!', 'success');
 
                 // Reveal OTP input box if hidden
                 if (codeContainerEl) {
@@ -54,11 +55,6 @@
                         cEl.style.display = 'block';
                         cEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
-                }
-
-                // Show local demo assistant toast / banner with auto-fill option
-                if (data.demoCode) {
-                    this.showDemoHelper(data.demoCode, autoFillInputEl);
                 }
 
                 // Start countdown timer on send button
@@ -86,7 +82,7 @@
             const originalText = btn ? btn.innerHTML : 'Verify';
 
             if (!code || code.trim().length !== 6) {
-                this.showStatus(statusEl, 'Please enter the complete 6-digit verification code.', 'error');
+                this.showStatus(statusEl, 'Please enter the complete 6-digit verification code from your email.', 'error');
                 return;
             }
 
@@ -134,54 +130,6 @@
                     onError(err);
                 }
             });
-        },
-
-        /**
-         * Helper display for demo environment with quick auto-fill
-         */
-        showDemoHelper: function(code, autoFillInputEl) {
-            let helper = document.getElementById('findit-otp-demo-helper');
-            if (!helper) {
-                helper = document.createElement('div');
-                helper.id = 'findit-otp-demo-helper';
-                helper.className = 'otp-demo-toast';
-                document.body.appendChild(helper);
-            }
-
-            helper.innerHTML = `
-                <div class="otp-toast-content">
-                    <div class="otp-toast-title">
-                        <span class="otp-shield-icon">&#128272;</span>
-                        <strong>Campus Security OTP Dispatched</strong>
-                    </div>
-                    <div class="otp-toast-body">
-                        Demo Verification Code: <span class="otp-code-highlight">${code}</span>
-                    </div>
-                    <div class="otp-toast-actions">
-                        <button type="button" class="btn btn-sm btn-primary otp-autofill-btn" id="otpToastAutoFillBtn">
-                            Auto-Fill Code
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="this.closest('#findit-otp-demo-helper').style.display='none'">
-                            Dismiss
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            helper.style.display = 'block';
-
-            const autoFillBtn = document.getElementById('otpToastAutoFillBtn');
-            if (autoFillBtn) {
-                autoFillBtn.onclick = () => {
-                    const targetInput = typeof autoFillInputEl === 'string' ? document.getElementById(autoFillInputEl) : autoFillInputEl;
-                    if (targetInput) {
-                        targetInput.value = code;
-                        targetInput.dispatchEvent(new Event('input', { bubbles: true }));
-                        targetInput.focus();
-                    }
-                    helper.style.display = 'none';
-                };
-            }
         },
 
         /**

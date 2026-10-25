@@ -19,6 +19,10 @@ public class OtpResponseDto {
         this.expirySeconds = expirySeconds;
     }
 
+    public static OtpResponseDto success(String message, String maskedTarget, int expirySeconds) {
+        return new OtpResponseDto(true, message, maskedTarget, null, expirySeconds);
+    }
+
     public static OtpResponseDto success(String message, String maskedTarget, String demoCode, int expirySeconds) {
         return new OtpResponseDto(true, message, maskedTarget, demoCode, expirySeconds);
     }
